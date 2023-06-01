@@ -7,13 +7,27 @@
 #include  <SDL2/SDL_syswm.h>
 #include "WallPaper.h"
 #undef main
+#define FPS 60
+#define frameDelay (1000 / FPS)
+#undef main
+
+
+
+SDL_Renderer* global_renderer = nullptr;
 
 void DrawRect(int x, int y, int w, int h)
 {
+	if (!global_renderer) return;
+
 	std::cout << "drawing rect " << x << " " <<
 		y << " " <<
 		w << " " <<
 		h << std::endl;
+
+	SDL_Rect rect{x,y,w,h};
+	SDL_SetRenderDrawColor(global_renderer, 255, 255, 255, 255);
+	SDL_RenderDrawRect(global_renderer, &rect);
+	SDL_RenderFillRect(global_renderer, &rect);
 }
 
 int Lua_DrawRect(lua_State* l)
@@ -26,37 +40,7 @@ int Lua_DrawRect(lua_State* l)
 	return 0;
 }
 
-
-//int main(int argc, char** argv)
-//{
-//	using namespace std;
-//	lua_State* L;
-//	L = luaL_newstate();
-//	luaL_openlibs(L);
-//
-//	lua_pushcfunction(L, Lua_DrawRect);
-//	lua_setglobal(L, "DrawRect");
-//
-//	if (luaL_dofile(L, "main.lua"))
-//	{
-//		cout << "error" << endl;
-//	}
-//
-//	lua_getglobal(L, "Main");
-//	lua_call(L, 0, 1);
-//
-//	lua_close(L);
-//
-//	return 0;
-//}
-
-
-#define FPS 60
-#define frameDelay (1000 / FPS)
-#undef main
-
-
-void fpsCap(Uint32 starting_tick) {
+void FPSCap(Uint32 starting_tick) {
 	if (frameDelay > SDL_GetTicks() - starting_tick) {
 		SDL_Delay(frameDelay - (SDL_GetTicks() - starting_tick));
 	}
@@ -65,9 +49,16 @@ void fpsCap(Uint32 starting_tick) {
 int main(int argc, char* argv[])
 {
 
+	using namespace std;
+	lua_State* L;
+	L = luaL_newstate();
+	luaL_openlibs(L);
 
 
-	// Ticks for fpsCap
+
+
+
+
 	uint32_t startingTick;
 	int endTick;
 
@@ -79,6 +70,12 @@ int main(int argc, char* argv[])
 		200,
 		SDL_WINDOW_HIDDEN | SDL_WINDOW_RESIZABLE
 	);
+
+	App::WallPaper wall;
+
+	global_renderer = wall.GetRenderer();
+
+
 	bool isHidden = true;
 
 
@@ -107,6 +104,22 @@ int main(int argc, char* argv[])
 	SDL_EventState(SDL_SYSWMEVENT, SDL_ENABLE);
 	SDL_Event e;
 	bool isRunning = true;
+
+
+
+	lua_pushcfunction(L, Lua_DrawRect);
+	lua_setglobal(L, "DrawRect");
+
+	if (luaL_dofile(L, "main.lua"))
+	{
+		cout << "error" << endl;
+		return 1;
+	}
+
+	lua_getglobal(L, "Main");
+	lua_call(L, 0, 1);
+
+
 	while (isRunning) {
 		// Get the number of milliseconds since the SDL library initialization.
 		startingTick = SDL_GetTicks();
@@ -161,13 +174,15 @@ int main(int argc, char* argv[])
 		}
 		if (animation)
 		{
-			ui.Clear();
-			ui.Update();
-			ui.Render();
+			wall.Clear();
+			lua_getglobal(L, "OnFrame");
+			lua_call(L, 0, 1);
+			wall.Update();
+			wall.Render();
 		}
 
 
-		fpsCap(startingTick);
+		FPSCap(startingTick);
 	}
 
 	{
@@ -186,6 +201,10 @@ int main(int argc, char* argv[])
 			bool success = Shell_NotifyIcon(NIM_DELETE, &icon);
 		}
 	}
+
+	global_renderer = nullptr;
+	lua_close(L);
+
 
 	return 0;
 }

@@ -34,7 +34,7 @@ namespace App
 				w,
 				h,
 				flags
-			);
+				);
 
 			m_renderer = SDL_CreateRenderer(m_window, -1, 0);
 
@@ -80,10 +80,17 @@ namespace App
 			return m_window;
 		}
 
+		SDL_Renderer* GetRenderer()
+		{
+			return m_renderer;
+		}
+
 		~Window()
 		{
 			SDL_DestroyWindow(m_window);
+			m_window = nullptr;
 			SDL_DestroyRenderer(m_renderer);
+			m_renderer = nullptr;
 			SDL_Quit();
 		}
 
