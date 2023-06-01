@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <lua.hpp>
 #include  <SDL2/SDL_syswm.h>
+#include <SDL2/SDL_timer.h>
 #include "WallPaper.h"
 #undef main
 #define FPS 60
@@ -15,27 +16,35 @@
 
 SDL_Renderer* global_renderer = nullptr;
 
-void DrawRect(int x, int y, int w, int h)
+//template<typename int>
+//void DrawRect(int x, int y, int w, int h)
+//{
+//	if (!global_renderer) return;
+//
+//	SDL_Rect rect{ x,y,w,h };
+//	SDL_SetRenderDrawColor(global_renderer, 255, 255, 255, 255);
+//	SDL_RenderDrawRect(global_renderer, &rect);
+//	SDL_RenderFillRect(global_renderer, &rect);
+//}
+
+void DrawRect(float x, float y, float w, float h)
 {
 	if (!global_renderer) return;
 
-	/*std::cout << "drawing rect " << x << " " <<
-		y << " " <<
-		w << " " <<
-		h << std::endl;*/
-
-	SDL_Rect rect{x,y,w,h};
+	SDL_FRect rect{ x,y,w,h };
 	SDL_SetRenderDrawColor(global_renderer, 255, 255, 255, 255);
-	SDL_RenderDrawRect(global_renderer, &rect);
-	SDL_RenderFillRect(global_renderer, &rect);
+	SDL_RenderDrawRectF(global_renderer, &rect);
+	SDL_RenderFillRectF(global_renderer, &rect);
 }
+
+
 
 int Lua_DrawRect(lua_State* l)
 {
-	double x = luaL_checknumber(l, 1);
-	double y = luaL_checknumber(l, 2);
-	double w = luaL_checknumber(l, 3);
-	double h = luaL_checknumber(l, 4);
+	float x = luaL_checknumber(l, 1);
+	float y = luaL_checknumber(l, 2);
+	float w = luaL_checknumber(l, 3);
+	float h = luaL_checknumber(l, 4);
 	DrawRect(x, y, w, h);
 	return 0;
 }
@@ -59,8 +68,8 @@ int main(int argc, char* argv[])
 
 
 
-	uint32_t startingTick;
-	int endTick;
+	uint32_t startingTick = 0;
+
 
 	App::Window ui(
 		"title",
@@ -121,11 +130,7 @@ int main(int argc, char* argv[])
 
 
 	while (isRunning) {
-		// Get the number of milliseconds since the SDL library initialization.
-		startingTick = SDL_GetTicks();
 
-
-		//--- USE THIS WHEN: You have an application window and want to be able to close it.
 		while (SDL_PollEvent(&e) != 0)
 		{
 			switch (e.type)
@@ -166,23 +171,44 @@ int main(int argc, char* argv[])
 				}
 				break;
 			case SDL_MOUSEBUTTONDOWN:
-				std::cout << "pressed" << std::endl;
-				animation = !animation;
+				if (e.button.button == SDL_BUTTON_LEFT)
+				{
+					std::cout << "pressed" << std::endl;
+					animation = !animation;
+
+				}
+				else if (e.button.button == SDL_BUTTON_RIGHT)
+				{
+					if (luaL_dofile(L, "main.lua"))
+					{
+						std::cout << "reload failed" << std::endl;
+						break;
+					}
+					std::cout << "reloaded" << std::endl;
+					lua_getglobal(L, "Main");
+					lua_call(L, 0, 1);
+				}
 				break;
 
 			}
 		}
+
+		double delta = (double)(SDL_GetTicks() - startingTick) / 1000;
+		startingTick = SDL_GetTicks();
+
+
 		if (animation)
 		{
 			wall.Clear();
 			lua_getglobal(L, "OnUpdate");
-			lua_call(L, 0, 1);
+			lua_pushnumber(L, delta);
+			lua_call(L, 1, 1);
 			wall.Update();
 			lua_getglobal(L, "OnFrame");
-			lua_call(L, 0, 1);
+			lua_pushnumber(L, delta);
+			lua_call(L, 1, 1);
 			wall.Render();
 		}
-
 
 		FPSCap(startingTick);
 	}
