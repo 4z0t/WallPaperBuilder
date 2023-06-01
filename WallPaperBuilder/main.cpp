@@ -19,10 +19,10 @@ void DrawRect(int x, int y, int w, int h)
 {
 	if (!global_renderer) return;
 
-	std::cout << "drawing rect " << x << " " <<
+	/*std::cout << "drawing rect " << x << " " <<
 		y << " " <<
 		w << " " <<
-		h << std::endl;
+		h << std::endl;*/
 
 	SDL_Rect rect{x,y,w,h};
 	SDL_SetRenderDrawColor(global_renderer, 255, 255, 255, 255);
@@ -175,9 +175,11 @@ int main(int argc, char* argv[])
 		if (animation)
 		{
 			wall.Clear();
-			lua_getglobal(L, "OnFrame");
+			lua_getglobal(L, "OnUpdate");
 			lua_call(L, 0, 1);
 			wall.Update();
+			lua_getglobal(L, "OnFrame");
+			lua_call(L, 0, 1);
 			wall.Render();
 		}
 
