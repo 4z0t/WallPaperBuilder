@@ -3,26 +3,35 @@ local circlePoints = {}
 
 
 function UpdateStar(star, delta)
-    if (star.x > 1920) then
-        star.x = 0
-        star.y = math.random(1, 1080)
-    else
-        star.x = star.x + star.s * delta * 100
-    end
+
+    star.deg = (star.deg + delta * star.s) % 360
+    local ddeg = math.rad(star.deg) * 10
+    local rad = math.sin(ddeg * 4 * star.s + star.size) * 15 + 400
+    star.x = math.cos(ddeg) * rad + 1920 / 2
+    star.y = math.sin(ddeg) * rad + 1080 / 2
+
+    -- if (star.x > 1920) then
+    --     star.x = 0
+    --     star.y = math.random(1, 1080)
+    -- else
+    --     star.x = star.x + star.s * delta * 100
+    -- end
 end
 
 function DrawStar(star)
-    DrawRect(star.x, star.y, star.s, star.s)
+    DrawRect(star.x, star.y, star.size, star.size)
 end
 
 function Main()
     math.randomseed()
-    for i = 1, 100 do
+    for i = 1, 5000 do
         table.insert(stars,
             {
                 x = math.random(1, 1920),
                 y = math.random(1, 1080),
-                s = math.random(1, 4)
+                s = math.random(1, 4),
+                size = math.random(1, 4),
+                deg = math.random() * 360
             }
         )
 
@@ -49,7 +58,14 @@ function OnFrame(delta)
         DrawStar(star)
     end
 
-    for i, p in ipairs(circlePoints) do
-        DrawRect(p.x, p.y, 1, 1)
-    end
+    -- local cn = #circlePoints
+    -- for i = 1, cn do
+    --     if (i == cn) then
+    --         DrawLine(circlePoints[i].x, circlePoints[i].y,
+    --             circlePoints[1].x, circlePoints[1].y)
+    --     else
+    --         DrawLine(circlePoints[i].x, circlePoints[i].y,
+    --             circlePoints[i + 1].x, circlePoints[i + 1].y)
+    --     end
+    -- end
 end

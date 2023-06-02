@@ -37,7 +37,24 @@ void DrawRect(float x, float y, float w, float h)
 	SDL_RenderFillRectF(global_renderer, &rect);
 }
 
+void DrawLine(float x1, float y1, float x2, float y2)
+{
+	if (!global_renderer) return;
 
+	SDL_SetRenderDrawColor(global_renderer, 255, 255, 255, 255);
+	SDL_RenderDrawLineF(global_renderer, x1, y1, x2, y2);
+}
+
+
+int Lua_DrawLine(lua_State* l)
+{
+	float x1 = luaL_checknumber(l, 1);
+	float y1 = luaL_checknumber(l, 2);
+	float x2 = luaL_checknumber(l, 3);
+	float y2 = luaL_checknumber(l, 4);
+	DrawLine(x1, y1, x2, y2);
+	return 0;
+}
 
 int Lua_DrawRect(lua_State* l)
 {
@@ -47,6 +64,12 @@ int Lua_DrawRect(lua_State* l)
 	float h = luaL_checknumber(l, 4);
 	DrawRect(x, y, w, h);
 	return 0;
+}
+
+inline void RegisterFunction(lua_State* l, const char* name, lua_CFunction func)
+{
+	lua_pushcfunction(l, func);
+	lua_setglobal(l, name);
 }
 
 void FPSCap(Uint32 starting_tick) {
@@ -62,11 +85,6 @@ int main(int argc, char* argv[])
 	lua_State* L;
 	L = luaL_newstate();
 	luaL_openlibs(L);
-
-
-
-
-
 
 	uint32_t startingTick = 0;
 
@@ -115,15 +133,15 @@ int main(int argc, char* argv[])
 	bool isRunning = true;
 
 
-
-	lua_pushcfunction(L, Lua_DrawRect);
-	lua_setglobal(L, "DrawRect");
+	RegisterFunction(L, "DrawRect", Lua_DrawRect);
+	RegisterFunction(L, "DrawLine", Lua_DrawLine);
 
 	if (luaL_dofile(L, "main.lua"))
 	{
 		cout << "error" << endl;
 		return 1;
 	}
+
 
 	lua_getglobal(L, "Main");
 	lua_call(L, 0, 1);
