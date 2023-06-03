@@ -24,7 +24,7 @@ namespace App
 
 			if (fullscreen)
 			{
-				flags = SDL_WINDOW_FULLSCREEN;
+				flags |= SDL_WINDOW_FULLSCREEN;
 			}
 
 			m_window = (*create_window)(
@@ -36,7 +36,7 @@ namespace App
 				flags
 				);
 
-			m_renderer = SDL_CreateRenderer(m_window, -1, 0);
+			m_renderer = SDL_CreateRenderer(m_window, -1, SDL_RENDERER_ACCELERATED);
 
 			if (m_renderer)
 			{

@@ -10,8 +10,8 @@ namespace App
 	class WallPaper : public Window
 	{
 	public:
-		WallPaper()
-			:Window("", 0, 0, 0, 0, 0, &WallPaper::GetWallPaperWindow, true)
+		WallPaper(Uint32 flags = 0)
+			:Window("", 0, 0, 0, 0, flags, &WallPaper::GetWallPaperWindow, true)
 		{
 
 		}

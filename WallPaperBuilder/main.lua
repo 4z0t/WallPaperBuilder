@@ -1,6 +1,6 @@
 local stars = {}
 local circlePoints = {}
-
+local math = math
 
 function UpdateStar(star, delta)
 
@@ -24,7 +24,7 @@ end
 
 function Main()
     math.randomseed()
-    for i = 1, 5000 do
+    for i = 1, 50000 do
         table.insert(stars,
             {
                 x = math.random(1, 1920),
