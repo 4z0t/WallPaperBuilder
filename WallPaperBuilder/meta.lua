@@ -1,6 +1,13 @@
 ---@meta
 
 
+---Returns size of wallpaper window
+---@return integer
+---@return integer
+function GetWindowSize()
+    
+end
+
 ---Draws rect
 ---@param x number
 ---@param y number

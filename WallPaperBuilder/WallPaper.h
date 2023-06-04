@@ -11,7 +11,7 @@ namespace App
 	{
 	public:
 		WallPaper(Uint32 flags = 0)
-			:Window("", 0, 0, 0, 0, flags, &WallPaper::GetWallPaperWindow, true)
+			:Window("", 0, 0, 0, 0, flags, WallPaper::GetWallPaperWindow, true)
 		{
 
 		}

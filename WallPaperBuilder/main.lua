@@ -2,13 +2,16 @@ local stars = {}
 local circlePoints = {}
 local math = math
 
+local w, h = 0, 0
+local radius = 200
+
 function UpdateStar(star, delta)
 
     star.deg = (star.deg + delta * star.s) % 360
     local ddeg = math.rad(star.deg) * 10
-    local rad = math.sin(ddeg * 4 * star.s + star.size) * 15 + 400
-    star.x = math.cos(ddeg) * rad + 1920 / 2
-    star.y = math.sin(ddeg) * rad + 1080 / 2
+    local rad = math.sin(ddeg * 4 * star.s + star.size) * 15 + radius
+    star.x = math.cos(ddeg) * rad + w / 2
+    star.y = math.sin(ddeg) * rad + h / 2
 
     -- if (star.x > 1920) then
     --     star.x = 0
@@ -23,12 +26,13 @@ function DrawStar(star)
 end
 
 function Main()
+    w, h = GetWindowSize()
     math.randomseed()
-    for i = 1, 50000 do
+    for i = 1, 5000 do
         table.insert(stars,
             {
-                x = math.random(1, 1920),
-                y = math.random(1, 1080),
+                x = math.random(1, w),
+                y = math.random(1, h),
                 s = math.random(1, 4),
                 size = math.random(1, 4),
                 deg = math.random() * 360
@@ -39,8 +43,8 @@ function Main()
 
     for i = 1, 360 do
         table.insert(circlePoints, {
-            x = math.cos(math.rad(i)) * 500 + 1920 / 2,
-            y = math.sin(math.rad(i)) * 500 + 1080 / 2,
+            x = math.cos(math.rad(i)) * 500 + w / 2,
+            y = math.sin(math.rad(i)) * 500 + h / 2,
         })
     end
 

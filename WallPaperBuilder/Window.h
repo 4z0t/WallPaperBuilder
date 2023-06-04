@@ -15,7 +15,7 @@ namespace App
 	{
 	public:
 		Window(const char* title, int x, int y, int w,
-			int h, Uint32 flags, WindowCreationFunction* create_window = &SDL_CreateWindow, bool fullscreen = false)
+			int h, Uint32 flags, WindowCreationFunction create_window = SDL_CreateWindow, bool fullscreen = false)
 		{
 			if (SDL_Init(SDL_INIT_VIDEO))
 			{
@@ -27,7 +27,7 @@ namespace App
 				flags |= SDL_WINDOW_FULLSCREEN;
 			}
 
-			m_window = (*create_window)(
+			m_window = create_window(
 				title,
 				SDL_WINDOWPOS_CENTERED,
 				SDL_WINDOWPOS_CENTERED,

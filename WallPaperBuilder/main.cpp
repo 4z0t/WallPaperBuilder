@@ -15,6 +15,7 @@
 
 
 SDL_Renderer* global_renderer = nullptr;
+SDL_Window* wallpaper_window = nullptr;
 
 //template<typename int>
 //void DrawRect(int x, int y, int w, int h)
@@ -66,6 +67,18 @@ int Lua_DrawRect(lua_State* l)
 	return 0;
 }
 
+int Lua_GetWallpaperWindowSize(lua_State* l)
+{
+	if (!wallpaper_window) return 0;
+	int w, h;
+	SDL_GetWindowSize(wallpaper_window, &w, &h);
+
+	lua_pushnumber(l, w);
+	lua_pushnumber(l, h);
+
+	return 2;
+}
+
 inline void RegisterFunction(lua_State* l, const char* name, lua_CFunction func)
 {
 	lua_pushcfunction(l, func);
@@ -101,6 +114,7 @@ int main(int argc, char* argv[])
 	App::WallPaper wall;
 
 	global_renderer = wall.GetRenderer();
+	wallpaper_window = wall.GetWindow();
 
 
 	bool isHidden = true;
@@ -135,6 +149,7 @@ int main(int argc, char* argv[])
 
 	RegisterFunction(L, "DrawRect", Lua_DrawRect);
 	RegisterFunction(L, "DrawLine", Lua_DrawLine);
+	RegisterFunction(L, "GetWindowSize", Lua_GetWallpaperWindowSize);
 
 	if (luaL_dofile(L, "main.lua"))
 	{
