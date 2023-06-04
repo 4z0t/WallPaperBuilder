@@ -158,7 +158,6 @@ int main(int argc, char* argv[])
 		return 1;
 	}
 
-
 	Lua_CallFunction(L, "Main");
 
 
@@ -219,8 +218,7 @@ int main(int argc, char* argv[])
 						break;
 					}
 					std::cout << "reloaded" << std::endl;
-					lua_getglobal(L, "Main");
-					lua_call(L, 0, 1);
+					Lua_CallFunction(L, "Main");
 				}
 				break;
 

@@ -3,16 +3,12 @@
 #include <iostream>
 #include <lua.hpp>
 #include <tuple>
-
+#include <string>
 
 
 
 template<typename T>
-void _LuaPushValue(lua_State* l, T arg)
-{
-	std::cout << "Unknown type " << typeid(T).name() << std::endl;
-	lua_pushnil(l);
-}
+void _LuaPushValue(lua_State* l, T arg);
 
 
 template<>
@@ -44,7 +40,7 @@ template<size_t N, typename T, typename ...Ts>
 size_t _Lua_PushArgs(lua_State* l, T&& arg, const Ts&... args)
 {
 	_LuaPushValue<T>(l, arg);
-	return _Lua_PushArgs<Ts..., N+1>(l, args...);
+	return _Lua_PushArgs<Ts..., N + 1>(l, args...);
 }
 
 template<size_t N, typename T>
