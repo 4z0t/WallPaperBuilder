@@ -214,7 +214,8 @@ int main(int argc, char* argv[])
 				{
 					if (luaL_dofile(L, "main.lua"))
 					{
-						std::cout << "reload failed" << std::endl;
+						std::cout << "reload failed: " << 
+							lua_tostring(L, -1) << std::endl;
 						break;
 					}
 					std::cout << "reloaded" << std::endl;
