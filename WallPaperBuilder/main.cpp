@@ -236,11 +236,11 @@ int main(int argc, char* argv[])
 			wall.Clear();
 			lua_getglobal(L, "OnUpdate");
 			lua_pushnumber(L, delta);
-			lua_call(L, 1, 1);
+			lua_call(L, 1, 0);
 			wall.Update();
 			lua_getglobal(L, "OnFrame");
 			lua_pushnumber(L, delta);
-			lua_call(L, 1, 1);
+			lua_call(L, 1, 0);
 			wall.Render();
 		}
 
