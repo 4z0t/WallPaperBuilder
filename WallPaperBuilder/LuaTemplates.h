@@ -7,6 +7,7 @@
 
 
 
+
 template<typename T>
 void _LuaPushValue(lua_State* l, T arg);
 
@@ -29,6 +30,11 @@ void _LuaPushValue(lua_State* l, const char* arg)
 	lua_pushstring(l, arg);
 }
 
+template<>
+void _LuaPushValue(lua_State* l, std::nullptr_t arg)
+{
+	lua_pushnil(l);
+}
 
 template<size_t N>
 size_t _Lua_PushArgs(lua_State* l)
@@ -36,11 +42,16 @@ size_t _Lua_PushArgs(lua_State* l)
 	return 0;
 }
 
+template<size_t N, typename T>
+size_t _Lua_PushArgs(lua_State* l, const T& arg);
 template<size_t N, typename T, typename ...Ts>
-size_t _Lua_PushArgs(lua_State* l, T&& arg, const Ts&... args)
+size_t _Lua_PushArgs(lua_State* l, const T& arg, const Ts&... args);
+
+template<size_t N, typename T, typename ...Ts>
+size_t _Lua_PushArgs(lua_State* l, const T& arg, const Ts&... args)
 {
 	_LuaPushValue<T>(l, arg);
-	return _Lua_PushArgs<Ts..., N + 1>(l, args...);
+	return _Lua_PushArgs<N + 1, Ts...>(l, args...);
 }
 
 template<size_t N, typename T>
