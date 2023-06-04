@@ -7,6 +7,7 @@
 #include  <SDL2/SDL_syswm.h>
 #include <SDL2/SDL_timer.h>
 #include "WallPaper.h"
+#include "LuaTemplates.h"
 #undef main
 #define FPS 60
 #define frameDelay (1000 / FPS)
@@ -158,8 +159,7 @@ int main(int argc, char* argv[])
 	}
 
 
-	lua_getglobal(L, "Main");
-	lua_call(L, 0, 1);
+	Lua_CallFunction(L, "Main");
 
 
 	while (isRunning) {
@@ -234,13 +234,9 @@ int main(int argc, char* argv[])
 		if (animation)
 		{
 			wall.Clear();
-			lua_getglobal(L, "OnUpdate");
-			lua_pushnumber(L, delta);
-			lua_call(L, 1, 0);
+			Lua_CallFunction(L, "OnUpdate", delta);
 			wall.Update();
-			lua_getglobal(L, "OnFrame");
-			lua_pushnumber(L, delta);
-			lua_call(L, 1, 0);
+			Lua_CallFunction(L, "OnFrame", delta);
 			wall.Render();
 		}
 

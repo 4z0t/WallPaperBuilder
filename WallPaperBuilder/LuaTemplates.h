@@ -2,17 +2,13 @@
 #include <memory>
 #include <iostream>
 #include <lua.hpp>
+#include <tuple>
 
-template<typename ...Ts>
-void Lua_CallFunction(lua_State* l, const char* name, Ts&&... args)
-{
-	size_t n = _Lua_PushArgs<Ts..., 0>(l, std::forward<Ts>(arg)...);
-	lua_call(l, n, 0);
-}
+
 
 
 template<typename T>
-void _LuaPushValue(lua_State* l, T&& arg)
+void _LuaPushValue(lua_State* l, T arg)
 {
 	std::cout << "Unknown type " << typeid(T).name() << std::endl;
 	lua_pushnil(l);
@@ -20,34 +16,48 @@ void _LuaPushValue(lua_State* l, T&& arg)
 
 
 template<>
-void _LuaPushValue(lua_State* l, lua_Integer&& arg)
+void _LuaPushValue(lua_State* l, lua_Integer arg)
 {
 	lua_pushinteger(l, arg);
 }
 
 template<>
-void _LuaPushValue(lua_State* l, lua_Number&& arg)
+void _LuaPushValue(lua_State* l, lua_Number arg)
 {
 	lua_pushnumber(l, arg);
 }
 
 template<>
-void _LuaPushValue(lua_State* l, const char*&& arg)
+void _LuaPushValue(lua_State* l, const char* arg)
 {
 	lua_pushstring(l, arg);
 }
 
-template<typename T, typename ...Ts, size_t N>
-size_t _Lua_PushArgs(lua_State* l, T&& arg, Ts&&... args)
+
+template<size_t N>
+size_t _Lua_PushArgs(lua_State* l)
 {
-	_LuaPushValue<T>(l, std::forward<T>(arg));
-	return _Lua_PushArgs<Ts..., N+1>(l, std::forward<Ts>(args)...);
+	return 0;
 }
 
-template<typename T, size_t N>
-size_t _Lua_PushArgs(lua_State* l, T&& arg)
+template<size_t N, typename T, typename ...Ts>
+size_t _Lua_PushArgs(lua_State* l, T&& arg, const Ts&... args)
 {
-	_LuaPushValue<T>(l, std::forward<T>(arg));
-	return N;
+	_LuaPushValue<T>(l, arg);
+	return _Lua_PushArgs<Ts..., N+1>(l, args...);
 }
 
+template<size_t N, typename T>
+size_t _Lua_PushArgs(lua_State* l, const T& arg)
+{
+	_LuaPushValue<T>(l, arg);
+	return N + 1;
+}
+
+template<typename ...Ts>
+void Lua_CallFunction(lua_State* l, const char* name, const Ts&... args)
+{
+	lua_getglobal(l, name);
+	size_t n = _Lua_PushArgs<0, Ts...>(l, args...);
+	lua_call(l, n, 0);
+}
