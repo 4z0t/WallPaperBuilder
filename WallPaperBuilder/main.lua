@@ -3,7 +3,7 @@ local circlePoints = {}
 local math = math
 
 local w, h = 0, 0
-local radius = 200
+local radius = 400
 
 function UpdateStar(star, delta)
 
@@ -27,6 +27,8 @@ end
 
 function Main()
     w, h = GetWindowSize()
+    print(w, h)
+    w, h = math.min(1920, w), math.min(1080, h)
     math.randomseed()
     for i = 1, 5000 do
         table.insert(stars,

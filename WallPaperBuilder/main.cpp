@@ -8,6 +8,7 @@
 #include <SDL2/SDL_timer.h>
 #include "WallPaper.h"
 #include "LuaTemplates.h"
+#include <functional>
 #undef main
 #define FPS 60
 #define frameDelay (1000 / FPS)
@@ -92,9 +93,15 @@ void FPSCap(Uint32 starting_tick) {
 	}
 }
 
+
+static int DoubleInt(int a)
+{
+	std::cout << a << std::endl;;
+	return a * 2;
+}
+
 int main(int argc, char* argv[])
 {
-
 	using namespace std;
 	lua_State* L;
 	L = luaL_newstate();
@@ -142,12 +149,13 @@ int main(int argc, char* argv[])
 	}
 
 	bool animation = true;
-
 	SDL_EventState(SDL_SYSWMEVENT, SDL_ENABLE);
 	SDL_Event e;
 	bool isRunning = true;
 
 
+	//RegisterFunction(L, "Test", LuaFunc<void(int)>(PrintInt));
+	RegisterFunction(L, "DoubleInt", Lua_WrapFunction(DoubleInt));
 	RegisterFunction(L, "DrawRect", Lua_DrawRect);
 	RegisterFunction(L, "DrawLine", Lua_DrawLine);
 	RegisterFunction(L, "GetWindowSize", Lua_GetWallpaperWindowSize);
@@ -213,7 +221,7 @@ int main(int argc, char* argv[])
 				{
 					if (luaL_dofile(L, "main.lua"))
 					{
-						std::cout << "reload failed: " << 
+						std::cout << "reload failed: " <<
 							lua_tostring(L, -1) << std::endl;
 						break;
 					}

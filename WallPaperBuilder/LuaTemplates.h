@@ -9,29 +9,29 @@
 
 
 template<typename T>
-void _LuaPushValue(lua_State* l, T arg);
+inline void _LuaPushValue(lua_State* l, T arg);
 
 
 template<>
-void _LuaPushValue(lua_State* l, lua_Integer arg)
+inline void _LuaPushValue(lua_State* l, lua_Integer arg)
 {
 	lua_pushinteger(l, arg);
 }
 
 template<>
-void _LuaPushValue(lua_State* l, lua_Number arg)
+inline void _LuaPushValue(lua_State* l, lua_Number arg)
 {
 	lua_pushnumber(l, arg);
 }
 
 template<>
-void _LuaPushValue(lua_State* l, const char* arg)
+inline void _LuaPushValue(lua_State* l, const char* arg)
 {
 	lua_pushstring(l, arg);
 }
 
 template<>
-void _LuaPushValue(lua_State* l, std::nullptr_t arg)
+inline void _LuaPushValue(lua_State* l, std::nullptr_t arg)
 {
 	lua_pushnil(l);
 }
@@ -68,3 +68,87 @@ void Lua_CallFunction(lua_State* l, const char* name, const Ts&... args)
 	size_t n = _Lua_PushArgs<0, Ts...>(l, args...);
 	lua_call(l, n, 0);
 }
+
+
+
+//template<typename TReturn, typename ...TArgs>
+// using Func = (TReturn (TArgs...);
+
+template<class>
+class LuaFunc;
+
+//template<typename TReturn, typename ...TArgs>
+//class LuaFunc<TReturn(TArgs...)>;
+//
+
+
+//template<typename TReturn, typename ...TArgs>
+//class LuaFunc<int(lua_State*)>
+//{
+//	typedef TReturn _Func(TArgs...);
+//public:
+//	LuaFunc(_Func func) : _func(func)
+//	{
+//
+//	}
+//
+//	int operator()(lua_State* l)
+//	{
+//
+//	}
+//private:
+//	const _Func _func;
+//};
+
+template<size_t Index, typename T>
+T GetArg(lua_State* l);
+
+template<size_t Index>
+float GetArg(lua_State* l)
+{
+	return luaL_checknumber(l, Index);
+}
+
+template<size_t Index>
+int GetArg(lua_State* l)
+{
+	return luaL_checkinteger(l, Index);
+}
+
+
+template<size_t N, typename TArg, typename ...TArgs>
+void GetArgs(lua_State* l, std::tuple<TArg, TArgs...>& args)
+{
+	std::get<N>(args) = GetArg<N + 1, TArg>(l);
+	GetArgs<N + 1, TArgs...>(l, args);
+}
+
+template<typename T>
+void PushResult(lua_State* l, T result);
+
+template<>
+void PushResult(lua_State* l, int result)
+{
+	lua_pushinteger(l, result);
+}
+
+template<>
+void PushResult(lua_State* l, float result)
+{
+	lua_pushnumber(l, result);
+}
+
+template<typename TReturn, typename ...TArgs>
+constexpr lua_CFunction Lua_WrapFunction(static TReturn (*func)(TArgs...))
+{
+	using namespace std;
+	return  [func](lua_State* l) -> int
+	{
+		tuple<TArgs...> args;
+		GetArgs<0, TArgs ...>(l, args);
+		TReturn result = func(get<TArgs>(args)...);
+		PushResult<TReturn>(l, result);
+		return 1;
+	};
+}
+
