@@ -115,6 +115,19 @@ int GetArg(lua_State* l, size_t Index)
 	return luaL_checkinteger(l, Index);
 }
 
+template<>
+double GetArg(lua_State* l, size_t Index)
+{
+	return luaL_checknumber(l, Index);
+}
+
+template<>
+const char* GetArg(lua_State* l, size_t Index)
+{
+	return luaL_checkstring(l, Index);
+}
+
+
 
 template<size_t N, typename TArgsTuple>
 void GetArgs(lua_State* l, TArgsTuple& args)
@@ -139,11 +152,23 @@ inline  void PushResult(lua_State* l, int result)
 }
 
 template<>
-inline void PushResult(lua_State* l, float result)
+inline void PushResult(lua_State* l, double result)
 {
 	lua_pushnumber(l, result);
 }
 
+template<>
+inline void PushResult(lua_State* l, float result)
+{
+	PushResult<double>(l, result);
+}
+
+
+template<>
+inline void PushResult(lua_State* l, const char* result)
+{
+	lua_pushstring(l, result);
+}
 
 template<typename FnClass, typename ...TArgs>
 struct Lua_FunctionWrapper
