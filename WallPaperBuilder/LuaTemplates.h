@@ -5,7 +5,7 @@
 #include <tuple>
 #include <string>
 #include <type_traits>
-
+#include <utility>
 
 
 template<typename T>
@@ -130,16 +130,17 @@ const char* GetArg(lua_State* l, size_t Index)
 
 
 template<size_t N, typename TArgsTuple>
-void GetArgs(lua_State* l, TArgsTuple& args)
+constexpr size_t GetArgs(lua_State* l, TArgsTuple& args)
 {
+	return N;
 }
 
 
 template<size_t N, typename TArgsTuple, typename TArg, typename ...TArgs>
-void GetArgs(lua_State* l, TArgsTuple& args)
+constexpr size_t GetArgs(lua_State* l, TArgsTuple& args)
 {
 	std::get<N>(args) = GetArg<TArg>(l, N + 1);
-	GetArgs<N + 1, TArgsTuple, TArgs...>(l, args);
+	return GetArgs<N + 1, TArgsTuple, TArgs...>(l, args);
 }
 
 template<typename T>
@@ -174,23 +175,31 @@ template<typename FnClass, typename ...TArgs>
 struct Lua_FunctionWrapper
 {
 	static_assert(std::is_invocable<decltype(FnClass::Call), TArgs...>::value, "Given class doesnt provide callable or can't be called with such arguments!");
+	using TReturn = typename std::invoke_result<decltype(FnClass::Call), TArgs...>::type;
+	using ArgsTupleT = std::tuple<TArgs...>;
+
+public:
 	static int Function(lua_State* l)
 	{
 		using namespace std;
-		using ArgsTupleT = tuple<TArgs...>;
-		using TReturn = typename invoke_result<decltype(FnClass::Call), TArgs...>::type;
 		ArgsTupleT args;
 		GetArgs<0, ArgsTupleT, TArgs ...>(l, args);
 		if constexpr (is_same<TReturn, void>::value)
 		{
-			FnClass::Call(get<TArgs>(args)...);
+			CallHelper(args, std::index_sequence_for<TArgs...>{});
 		}
 		else
 		{
-			TReturn result = FnClass::Call(get<TArgs>(args)...);
+			TReturn result = CallHelper(args, std::index_sequence_for<TArgs...>{});
 			PushResult<TReturn>(l, result);
 		}
 
 		return 1;
+	}
+private:
+	template <std::size_t ... Is>
+	static TReturn CallHelper(ArgsTupleT& args, std::index_sequence<Is...> const)
+	{
+		return FnClass::Call(std::get<Is>(args)...);
 	}
 };

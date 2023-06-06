@@ -26,6 +26,7 @@ function DrawStar(star)
 end
 
 function Main()
+    print(DoubleInt(2,3))
     w, h = GetWindowSize()
     print(w, h)
     w, h = math.min(1920, w), math.min(1080, h)

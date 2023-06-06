@@ -95,10 +95,10 @@ void FPSCap(Uint32 starting_tick) {
 
 class FnClass {
 public:
-	static int Call(int a)
+	static int Call(int a, int b)
 	{
-		std::cout << a << std::endl;;
-		return a * 2;
+		std::cout << a << b << std::endl;;
+		return a * 2 + b;
 	}
 };
 
@@ -159,7 +159,10 @@ int main(int argc, char* argv[])
 	//RegisterFunction(L, "Test", LuaFunc<void(int)>(PrintInt));
 	//RegisterFunction(L, "DoubleInt", Lua_WrapFunction(DoubleInt));
 
-	RegisterFunction(L, "DoubleInt", Lua_FunctionWrapper<FnClass, int>::Function);
+
+
+
+	RegisterFunction(L, "DoubleInt", Lua_FunctionWrapper<FnClass, int, int>::Function);
 	RegisterFunction(L, "DrawRect", Lua_DrawRect);
 	RegisterFunction(L, "DrawLine", Lua_DrawLine);
 	RegisterFunction(L, "GetWindowSize", Lua_GetWallpaperWindowSize);
