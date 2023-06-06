@@ -173,6 +173,7 @@ inline void PushResult(lua_State* l, const char* result)
 template<typename FnClass, typename ...TArgs>
 struct Lua_FunctionWrapper
 {
+	static_assert(std::is_invocable<decltype(FnClass::Call), TArgs...>::value, "Given class doesnt provide callable or can't be called with such arguments!");
 	static int Function(lua_State* l)
 	{
 		using namespace std;
