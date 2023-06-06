@@ -74,8 +74,8 @@ void Lua_CallFunction(lua_State* l, const char* name, const Ts&... args)
 //template<typename TReturn, typename ...TArgs>
 // using Func = (TReturn (TArgs...);
 
-template<class>
-class LuaFunc;
+//template<class>
+//class LuaFunc;
 
 //template<typename TReturn, typename ...TArgs>
 //class LuaFunc<TReturn(TArgs...)>;
@@ -100,17 +100,17 @@ class LuaFunc;
 //	const _Func _func;
 //};
 
-template<size_t Index, typename T>
-T GetArg(lua_State* l);
+template<typename T>
+T GetArg(lua_State* l, size_t Index);
 
-template<size_t Index>
-float GetArg(lua_State* l)
+template<>
+float GetArg(lua_State* l, size_t Index)
 {
 	return luaL_checknumber(l, Index);
 }
 
-template<size_t Index>
-int GetArg(lua_State* l)
+template<>
+int GetArg(lua_State* l, size_t Index)
 {
 	return luaL_checkinteger(l, Index);
 }
@@ -125,7 +125,7 @@ void GetArgs(lua_State* l, TArgsTuple& args)
 template<size_t N, typename TArgsTuple, typename TArg, typename ...TArgs>
 void GetArgs(lua_State* l, TArgsTuple& args)
 {
-	std::get<N>(args) = GetArg<N + 1, TArg>(l);
+	std::get<N>(args) = GetArg<TArg>(l, N + 1);
 	GetArgs<N + 1, TArgsTuple, TArgs...>(l, args);
 }
 
@@ -144,56 +144,27 @@ inline void PushResult(lua_State* l, float result)
 	lua_pushnumber(l, result);
 }
 
-//template<typename TReturn, typename ...TArgs>
-//constexpr lua_CFunction Lua_WrapFunction(static TReturn (*func)(TArgs...))
-//{
-//	using namespace std;
-//	return  [func](lua_State* l) -> int
-//	{
-//		tuple<TArgs...> args;
-//		GetArgs<0, TArgs ...>(l, args);
-//		TReturn result = func(get<TArgs>(args)...);
-//		PushResult<TReturn>(l, result);
-//		return 1;
-//	};
-//}
-//
-//
-//
 
-
-template<typename FnClass, typename TReturn, typename ...TArgs>
-struct Lua_FunctionWrapper;
-
-template<typename FnClass, typename TReturn, typename ...TArgs>
+template<typename FnClass, typename ...TArgs>
 struct Lua_FunctionWrapper
 {
-	//static_assert(std::is_same<decltype(FnClass::Call), TReturn(TArgs...)>::value);
 	static int Function(lua_State* l)
 	{
 		using namespace std;
 		using ArgsTupleT = tuple<TArgs...>;
+		using TReturn = typename invoke_result<decltype(FnClass::Call), TArgs...>::type;
 		ArgsTupleT args;
-		
 		GetArgs<0, ArgsTupleT, TArgs ...>(l, args);
-		TReturn result = FnClass::Call(get<TArgs>(args)...);
-		PushResult<TReturn>(l, result);
+		if constexpr (is_same<TReturn, void>::value)
+		{
+			FnClass::Call(get<TArgs>(args)...);
+		}
+		else
+		{
+			TReturn result = FnClass::Call(get<TArgs>(args)...);
+			PushResult<TReturn>(l, result);
+		}
+
 		return 1;
 	}
 };
-
-
-//template<typename FnClass, typename TReturn, typename ...TArgs>
-//constexpr lua_CFunction Lua_WrapFunction()
-//{
-//	using namespace std;
-//	static_assert(is_same<decltype(FnClass::Call), TReturn(TArgs...)>::value);
-//	return  [](lua_State* l) -> int
-//	{
-//		tuple<TArgs...> args;
-//		GetArgs<0, TArgs ...>(l, args);
-//		TReturn result = FnClass::Call(get<TArgs>(args)...);
-//		PushResult<TReturn>(l, result);
-//		return 1;
-//	};
-//}
