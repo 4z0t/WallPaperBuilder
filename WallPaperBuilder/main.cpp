@@ -169,7 +169,7 @@ int main(int argc, char* argv[])
 
 	if (luaL_dofile(L, "main.lua"))
 	{
-		cout << "error" << endl;
+		cout << "error:" << lua_tostring(L, -1) << std::endl;
 		return 1;
 	}
 
