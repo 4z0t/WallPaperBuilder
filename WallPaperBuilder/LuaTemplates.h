@@ -185,7 +185,8 @@ public:
 		using namespace std;
 		ArgsTupleT args;
 		GetArgs<0, ArgsTupleT, TArgs ...>(l, args);
-		if constexpr (is_same<TReturn, void>::value)
+		
+		if constexpr (std::is_void<TReturn>::value)
 		{
 			Lua_FunctionWrapper::CallHelper(args, Indexes{});
 			return 0;
@@ -219,7 +220,7 @@ public:
 		using namespace std;
 		ArgsTupleT args;
 		GetArgs<0, ArgsTupleT, TArgs ...>(l, args);
-		if constexpr (is_same<TReturn, void>::value)
+		if constexpr (std::is_void<TReturn>::value)
 		{
 			_Lua_FunctionWrapper::CallHelper(args, std::index_sequence_for<TArgs...>{});
 			return 0;
