@@ -162,7 +162,8 @@ int main(int argc, char* argv[])
 
 
 
-	RegisterFunction(L, "DoubleInt", Lua_FunctionWrapper<FnClass, int, int>::Function);
+	RegisterFunction(L, "DoubleInt", _Lua_FunctionWrapper<decltype(FnClass::Call), FnClass::Call, int, int>::Function);
+	//RegisterFunction(L, "DoubleInt", Lua_FunctionWrapper<FnClass, int, int>::Function);
 	RegisterFunction(L, "DrawRect", Lua_DrawRect);
 	RegisterFunction(L, "DrawLine", Lua_DrawLine);
 	RegisterFunction(L, "GetWindowSize", Lua_GetWallpaperWindowSize);
