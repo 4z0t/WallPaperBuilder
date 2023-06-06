@@ -239,3 +239,5 @@ private:
 		return fn(std::get<Is>(args)...);
 	}
 };
+
+#define functype(f) decltype(f), f
