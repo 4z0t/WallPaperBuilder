@@ -20,29 +20,18 @@
 SDL_Renderer* global_renderer = nullptr;
 SDL_Window* wallpaper_window = nullptr;
 
-//template<typename int>
-//void DrawRect(int x, int y, int w, int h)
-//{
-//	if (!global_renderer) return;
-//
-//	SDL_Rect rect{ x,y,w,h };
-//	SDL_SetRenderDrawColor(global_renderer, 255, 255, 255, 255);
-//	SDL_RenderDrawRect(global_renderer, &rect);
-//	SDL_RenderFillRect(global_renderer, &rect);
-//}
+
 void SetColor(Uint8 r, Uint8 g, Uint8 b, Uint8 a)
 {
 	if (!global_renderer) return;
 	SDL_SetRenderDrawColor(global_renderer, r, g, b, a);
 }
 
-
 void DrawRect(float x, float y, float w, float h)
 {
 	if (!global_renderer) return;
 
 	SDL_FRect rect{ x,y,w,h };
-	//SDL_SetRenderDrawColor(global_renderer, 255, 255, 255, 255);
 	SDL_RenderDrawRectF(global_renderer, &rect);
 	SDL_RenderFillRectF(global_renderer, &rect);
 }
@@ -68,17 +57,6 @@ void FPSCap(Uint32 starting_tick) {
 		SDL_Delay(frameDelay - (SDL_GetTicks() - starting_tick));
 	}
 }
-
-class FnClass {
-public:
-
-	static int Call(int a, int b)
-	{
-		std::cout << a << b << std::endl;;
-		return a * 2 + b;
-	}
-};
-
 
 class Callable
 {
@@ -141,10 +119,6 @@ int main(int argc, char* argv[])
 	SDL_EventState(SDL_SYSWMEVENT, SDL_ENABLE);
 	SDL_Event e;
 	bool isRunning = true;
-
-
-	//RegisterFunction(L, "Test", LuaFunc<void(int)>(PrintInt));
-	//RegisterFunction(L, "DoubleInt", Lua_WrapFunction(DoubleInt));
 
 
 	Lua::RegisterFunction(L, "DoubleInt", Lua::FunctionWrapper<Callable, int, int>::Function);
