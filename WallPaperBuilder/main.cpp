@@ -5,11 +5,10 @@
 #include <stdlib.h>
 #include <tuple>
 #include <lua.hpp>
-#include  <SDL2/SDL_syswm.h>
+#include <SDL2/SDL_syswm.h>
 #include <SDL2/SDL_timer.h>
 #include "WallPaper.hpp"
 #include "LuaTemplates.hpp"
-#include <functional>
 #undef main
 #define FPS 60
 #define frameDelay (1000 / FPS)
@@ -64,6 +63,11 @@ public:
 	int operator()(int a, int b)
 	{
 		return a * a + b;
+	}
+
+	int operator()(int a, int b, int c)
+	{
+		return a * a + b * c;
 	}
 };
 
@@ -120,8 +124,8 @@ int main(int argc, char* argv[])
 	SDL_Event e;
 	bool isRunning = true;
 
-
 	Lua::RegisterFunction(L, "DoubleInt", Lua::FunctionWrapper<Callable, int, int>::Function);
+	Lua::RegisterFunction(L, "TripleInt", Lua::FunctionWrapper<Callable, int, int, int>::Function);
 	Lua::RegisterFunction(L, "SetColor", Lua::CFunctionWrapper<functype(SetColor), Uint8, Uint8, Uint8, Uint8>::Function);
 	Lua::RegisterFunction(L, "DrawRect", Lua::CFunctionWrapper<functype(DrawRect), float, float, float, float>::Function);
 	Lua::RegisterFunction(L, "DrawLine", Lua::CFunctionWrapper<functype(DrawLine), float, float, float, float>::Function);
