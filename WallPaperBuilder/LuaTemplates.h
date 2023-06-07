@@ -246,7 +246,7 @@ private:
 
 
 template<typename Fn, Fn fn, typename ...TArgs>
-struct _Lua_FunctionWrapper
+struct Lua_CFunctionWrapper
 {
 	static_assert(std::is_invocable<decltype(fn), TArgs...>::value, "Given function can't be called with such arguments!");
 	using TReturn = typename std::invoke_result<decltype(fn), TArgs...>::type;
@@ -261,12 +261,12 @@ public:
 		GetArgs<0, ArgsTupleT, TArgs ...>(l, args);
 		if constexpr (std::is_void<TReturn>::value)
 		{
-			_Lua_FunctionWrapper::CallHelper(args, Indexes{});
+			Lua_CFunctionWrapper::CallHelper(args, Indexes{});
 			return 0;
 		}
 		else
 		{
-			TReturn result = _Lua_FunctionWrapper::CallHelper(args, Indexes{});
+			TReturn result = Lua_CFunctionWrapper::CallHelper(args, Indexes{});
 			size_t n_results = PushResult(l, result);
 			return n_results;
 		}

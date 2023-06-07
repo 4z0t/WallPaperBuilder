@@ -105,6 +105,7 @@ void FPSCap(Uint32 starting_tick) {
 
 class FnClass {
 public:
+
 	static int Call(int a, int b)
 	{
 		std::cout << a << b << std::endl;;
@@ -170,13 +171,10 @@ int main(int argc, char* argv[])
 	//RegisterFunction(L, "DoubleInt", Lua_WrapFunction(DoubleInt));
 
 
-
-
 	RegisterFunction(L, "DoubleInt", Lua_FunctionWrapper<FnClass, int, int>::Function);
-	RegisterFunction(L, "DrawRect", _Lua_FunctionWrapper<functype(DrawRect), float, float, float, float>::Function);
-	RegisterFunction(L, "DrawLine", Lua_DrawLine);
-	RegisterFunction(L, "GetWindowSize", _Lua_FunctionWrapper<functype(GetWallpaperWindowSize)>::Function);
-	//RegisterFunction(L, "GetWindowSize", Lua_GetWallpaperWindowSize);
+	RegisterFunction(L, "DrawRect", Lua_CFunctionWrapper<functype(DrawRect), float, float, float, float>::Function);
+	RegisterFunction(L, "DrawLine", Lua_CFunctionWrapper<functype(DrawLine), float, float, float, float>::Function);
+	RegisterFunction(L, "GetWindowSize", Lua_CFunctionWrapper<functype(GetWallpaperWindowSize)>::Function);
 
 	if (luaL_dofile(L, "main.lua"))
 	{
