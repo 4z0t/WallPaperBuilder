@@ -5,7 +5,7 @@
 ---@return integer
 ---@return integer
 function GetWindowSize()
-    
+
 end
 
 ---Draws rect
@@ -23,5 +23,14 @@ end
 ---@param x2 number
 ---@param y2 number
 function DrawLine(x1, y1, x2, y2)
+
+end
+
+---sets color
+---@param r integer
+---@param g integer
+---@param b integer
+---@param a integer
+function SetColor(r, g, b, a)
 
 end
