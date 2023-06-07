@@ -3,6 +3,7 @@
 #include <shellapi.h>
 #include <iostream>
 #include <stdlib.h>
+#include <tuple>
 #include <lua.hpp>
 #include  <SDL2/SDL_syswm.h>
 #include <SDL2/SDL_timer.h>
@@ -69,14 +70,23 @@ int Lua_DrawRect(lua_State* l)
 	return 0;
 }
 
+std::tuple<int, int> GetWallpaperWindowSize()
+{
+	if (!wallpaper_window) return { 0,0 };
+	int w, h;
+	SDL_GetWindowSize(wallpaper_window, &w, &h);
+	return { w,h };
+}
+
+
 int Lua_GetWallpaperWindowSize(lua_State* l)
 {
 	if (!wallpaper_window) return 0;
 	int w, h;
 	SDL_GetWindowSize(wallpaper_window, &w, &h);
 
-	lua_pushnumber(l, w);
-	lua_pushnumber(l, h);
+	lua_pushinteger(l, w);
+	lua_pushinteger(l, h);
 
 	return 2;
 }
@@ -165,7 +175,8 @@ int main(int argc, char* argv[])
 	RegisterFunction(L, "DoubleInt", Lua_FunctionWrapper<FnClass, int, int>::Function);
 	RegisterFunction(L, "DrawRect", _Lua_FunctionWrapper<functype(DrawRect), float, float, float, float>::Function);
 	RegisterFunction(L, "DrawLine", Lua_DrawLine);
-	RegisterFunction(L, "GetWindowSize", Lua_GetWallpaperWindowSize);
+	RegisterFunction(L, "GetWindowSize", _Lua_FunctionWrapper<functype(GetWallpaperWindowSize)>::Function);
+	//RegisterFunction(L, "GetWindowSize", Lua_GetWallpaperWindowSize);
 
 	if (luaL_dofile(L, "main.lua"))
 	{

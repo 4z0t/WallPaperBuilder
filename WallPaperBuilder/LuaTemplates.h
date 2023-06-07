@@ -19,6 +19,12 @@ inline void _LuaPushValue(lua_State* l, lua_Integer arg)
 }
 
 template<>
+inline void _LuaPushValue(lua_State* l, int arg)
+{
+	_LuaPushValue<lua_Integer>(l, static_cast<lua_Integer>(arg));
+}
+
+template<>
 inline void _LuaPushValue(lua_State* l, lua_Number arg)
 {
 	lua_pushnumber(l, arg);
@@ -143,30 +149,62 @@ constexpr size_t GetArgs(lua_State* l, TArgsTuple& args)
 	return GetArgs<N + 1, TArgsTuple, TArgs...>(l, args);
 }
 
+
+
+
+template<size_t Index, typename TResult>
+inline size_t _PushResult(lua_State* l, TResult& result)
+{
+	return Index;
+}
+
+
+template<size_t Index, typename TResult, typename T, typename ...Ts>
+inline size_t _PushResult(lua_State* l, TResult& result)
+{
+	_LuaPushValue<T>(l, std::get<Index>(result));
+	return _PushResult<Index + 1, TResult, Ts...>(l, result);
+}
+
+
 template<typename T>
-inline void PushResult(lua_State* l, T result);
+inline void _PushResult(lua_State* l, T result);
+
+template<typename T>
+inline size_t PushResult(lua_State* l, T result)
+{
+	_PushResult<T>(l, result);
+	return 1;
+}
+
+
+template<typename ...Ts>
+inline size_t PushResult(lua_State* l, std::tuple<Ts...>& result)
+{
+	return _PushResult<0, std::tuple<Ts...>, Ts...>(l, result);
+}
 
 template<>
-inline  void PushResult(lua_State* l, int result)
+inline  void _PushResult(lua_State* l, int result)
 {
 	lua_pushinteger(l, result);
 }
 
 template<>
-inline void PushResult(lua_State* l, double result)
+inline void _PushResult(lua_State* l, double result)
 {
 	lua_pushnumber(l, result);
 }
 
 template<>
-inline void PushResult(lua_State* l, float result)
+inline void _PushResult(lua_State* l, float result)
 {
-	PushResult<double>(l, result);
+	_PushResult<double>(l, result);
 }
 
 
 template<>
-inline void PushResult(lua_State* l, const char* result)
+inline void _PushResult(lua_State* l, const char* result)
 {
 	lua_pushstring(l, result);
 }
@@ -185,7 +223,7 @@ public:
 		using namespace std;
 		ArgsTupleT args;
 		GetArgs<0, ArgsTupleT, TArgs ...>(l, args);
-		
+
 		if constexpr (std::is_void<TReturn>::value)
 		{
 			Lua_FunctionWrapper::CallHelper(args, Indexes{});
@@ -194,8 +232,8 @@ public:
 		else
 		{
 			TReturn result = Lua_FunctionWrapper::CallHelper(args, Indexes{});
-			PushResult<TReturn>(l, result);
-			return 1;
+			size_t n_results = PushResult(l, result);
+			return n_results;
 		}
 	}
 private:
@@ -229,8 +267,8 @@ public:
 		else
 		{
 			TReturn result = _Lua_FunctionWrapper::CallHelper(args, Indexes{});
-			PushResult<TReturn>(l, result);
-			return 1;
+			size_t n_results = PushResult(l, result);
+			return n_results;
 		}
 	}
 private:
