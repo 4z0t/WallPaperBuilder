@@ -30,13 +30,19 @@ SDL_Window* wallpaper_window = nullptr;
 //	SDL_RenderDrawRect(global_renderer, &rect);
 //	SDL_RenderFillRect(global_renderer, &rect);
 //}
+void SetColor(Uint8 r, Uint8 g, Uint8 b, Uint8 a)
+{
+	if (!global_renderer) return;
+	SDL_SetRenderDrawColor(global_renderer, r, g, b, a);
+}
+
 
 void DrawRect(float x, float y, float w, float h)
 {
 	if (!global_renderer) return;
 
 	SDL_FRect rect{ x,y,w,h };
-	SDL_SetRenderDrawColor(global_renderer, 255, 255, 255, 255);
+	//SDL_SetRenderDrawColor(global_renderer, 255, 255, 255, 255);
 	SDL_RenderDrawRectF(global_renderer, &rect);
 	SDL_RenderFillRectF(global_renderer, &rect);
 }
@@ -70,6 +76,16 @@ public:
 	{
 		std::cout << a << b << std::endl;;
 		return a * 2 + b;
+	}
+};
+
+
+class Callable
+{
+public:
+	int operator()(int a, int b)
+	{
+		return a * a + b;
 	}
 };
 
@@ -131,7 +147,8 @@ int main(int argc, char* argv[])
 	//RegisterFunction(L, "DoubleInt", Lua_WrapFunction(DoubleInt));
 
 
-	Lua::RegisterFunction(L, "DoubleInt", Lua::FunctionWrapper<FnClass, int, int>::Function);
+	Lua::RegisterFunction(L, "DoubleInt", Lua::FunctionWrapper<Callable, int, int>::Function);
+	Lua::RegisterFunction(L, "SetColor", Lua::CFunctionWrapper<functype(SetColor), Uint8, Uint8, Uint8, Uint8>::Function);
 	Lua::RegisterFunction(L, "DrawRect", Lua::CFunctionWrapper<functype(DrawRect), float, float, float, float>::Function);
 	Lua::RegisterFunction(L, "DrawLine", Lua::CFunctionWrapper<functype(DrawLine), float, float, float, float>::Function);
 	Lua::RegisterFunction(L, "GetWindowSize", Lua::CFunctionWrapper<functype(GetWallpaperWindowSize)>::Function);

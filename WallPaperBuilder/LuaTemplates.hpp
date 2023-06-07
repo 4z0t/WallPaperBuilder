@@ -131,6 +131,12 @@ namespace Lua
 	}
 
 	template<>
+	Uint8 GetArg(lua_State* l, size_t Index)
+	{
+		return luaL_checkinteger(l, Index);
+	}
+
+	template<>
 	double GetArg(lua_State* l, size_t Index)
 	{
 		return luaL_checknumber(l, Index);
@@ -221,8 +227,8 @@ namespace Lua
 	template<typename FnClass, typename ...TArgs>
 	struct FunctionWrapper
 	{
-		static_assert(std::is_invocable<decltype(FnClass::Call), TArgs...>::value, "Given class doesnt provide callable or can't be called with such arguments!");
-		using TReturn = typename std::invoke_result<decltype(FnClass::Call), TArgs...>::type;
+		static_assert(std::is_invocable<FnClass, TArgs...>::value, "Given class doesnt provide callable or can't be called with such arguments!");
+		using TReturn = typename std::invoke_result<FnClass, TArgs...>::type;
 		using ArgsTupleT = std::tuple<TArgs...>;
 		using Indexes = std::index_sequence_for<TArgs...>;
 
@@ -249,7 +255,7 @@ namespace Lua
 		template <std::size_t ... Is>
 		static TReturn CallHelper(ArgsTupleT& args, std::index_sequence<Is...> const)
 		{
-			return FnClass::Call(std::get<Is>(args)...);
+			return FnClass{}(std::get<Is>(args)...);
 		}
 	};
 
