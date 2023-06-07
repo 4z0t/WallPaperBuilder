@@ -134,9 +134,9 @@
     <ClCompile Include="Window.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="LuaTemplates.h" />
-    <ClInclude Include="WallPaper.h" />
-    <ClInclude Include="Window.h" />
+    <ClInclude Include="LuaTemplates.hpp" />
+    <ClInclude Include="WallPaper.hpp" />
+    <ClInclude Include="Window.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

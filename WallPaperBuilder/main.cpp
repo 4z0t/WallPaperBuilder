@@ -7,8 +7,8 @@
 #include <lua.hpp>
 #include  <SDL2/SDL_syswm.h>
 #include <SDL2/SDL_timer.h>
-#include "WallPaper.h"
-#include "LuaTemplates.h"
+#include "WallPaper.hpp"
+#include "LuaTemplates.hpp"
 #include <functional>
 #undef main
 #define FPS 60

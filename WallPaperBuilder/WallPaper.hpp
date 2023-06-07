@@ -1,5 +1,5 @@
 #pragma once
-#include "Window.h"
+#include "Window.hpp"
 
 BOOL CALLBACK EnumWindowsProc(HWND hwnd, LPARAM lParam);
 HWND _GetWallpaperWindow();
