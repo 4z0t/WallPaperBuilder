@@ -210,9 +210,10 @@ private:
 template<typename Fn, Fn fn, typename ...TArgs>
 struct _Lua_FunctionWrapper
 {
-	static_assert(std::is_invocable<decltype(fn), TArgs...>::value, "Given class doesnt provide callable or can't be called with such arguments!");
+	static_assert(std::is_invocable<decltype(fn), TArgs...>::value, "Given function can't be called with such arguments!");
 	using TReturn = typename std::invoke_result<decltype(fn), TArgs...>::type;
 	using ArgsTupleT = std::tuple<TArgs...>;
+	using Indexes = std::index_sequence_for<TArgs...>;
 
 public:
 	static int Function(lua_State* l)
@@ -222,12 +223,12 @@ public:
 		GetArgs<0, ArgsTupleT, TArgs ...>(l, args);
 		if constexpr (std::is_void<TReturn>::value)
 		{
-			_Lua_FunctionWrapper::CallHelper(args, std::index_sequence_for<TArgs...>{});
+			_Lua_FunctionWrapper::CallHelper(args, Indexes{});
 			return 0;
 		}
 		else
 		{
-			TReturn result = _Lua_FunctionWrapper::CallHelper(args, std::index_sequence_for<TArgs...>{});
+			TReturn result = _Lua_FunctionWrapper::CallHelper(args, Indexes{});
 			PushResult<TReturn>(l, result);
 			return 1;
 		}
