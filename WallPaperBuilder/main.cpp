@@ -49,52 +49,12 @@ void DrawLine(float x1, float y1, float x2, float y2)
 	SDL_RenderDrawLineF(global_renderer, x1, y1, x2, y2);
 }
 
-
-int Lua_DrawLine(lua_State* l)
-{
-	float x1 = luaL_checknumber(l, 1);
-	float y1 = luaL_checknumber(l, 2);
-	float x2 = luaL_checknumber(l, 3);
-	float y2 = luaL_checknumber(l, 4);
-	DrawLine(x1, y1, x2, y2);
-	return 0;
-}
-
-int Lua_DrawRect(lua_State* l)
-{
-	float x = luaL_checknumber(l, 1);
-	float y = luaL_checknumber(l, 2);
-	float w = luaL_checknumber(l, 3);
-	float h = luaL_checknumber(l, 4);
-	DrawRect(x, y, w, h);
-	return 0;
-}
-
 std::tuple<int, int> GetWallpaperWindowSize()
 {
 	if (!wallpaper_window) return { 0,0 };
 	int w, h;
 	SDL_GetWindowSize(wallpaper_window, &w, &h);
 	return { w,h };
-}
-
-
-int Lua_GetWallpaperWindowSize(lua_State* l)
-{
-	if (!wallpaper_window) return 0;
-	int w, h;
-	SDL_GetWindowSize(wallpaper_window, &w, &h);
-
-	lua_pushinteger(l, w);
-	lua_pushinteger(l, h);
-
-	return 2;
-}
-
-inline void RegisterFunction(lua_State* l, const char* name, lua_CFunction func)
-{
-	lua_pushcfunction(l, func);
-	lua_setglobal(l, name);
 }
 
 void FPSCap(Uint32 starting_tick) {
@@ -171,10 +131,10 @@ int main(int argc, char* argv[])
 	//RegisterFunction(L, "DoubleInt", Lua_WrapFunction(DoubleInt));
 
 
-	RegisterFunction(L, "DoubleInt", Lua_FunctionWrapper<FnClass, int, int>::Function);
-	RegisterFunction(L, "DrawRect", Lua_CFunctionWrapper<functype(DrawRect), float, float, float, float>::Function);
-	RegisterFunction(L, "DrawLine", Lua_CFunctionWrapper<functype(DrawLine), float, float, float, float>::Function);
-	RegisterFunction(L, "GetWindowSize", Lua_CFunctionWrapper<functype(GetWallpaperWindowSize)>::Function);
+	Lua::RegisterFunction(L, "DoubleInt", Lua::FunctionWrapper<FnClass, int, int>::Function);
+	Lua::RegisterFunction(L, "DrawRect", Lua::CFunctionWrapper<functype(DrawRect), float, float, float, float>::Function);
+	Lua::RegisterFunction(L, "DrawLine", Lua::CFunctionWrapper<functype(DrawLine), float, float, float, float>::Function);
+	Lua::RegisterFunction(L, "GetWindowSize", Lua::CFunctionWrapper<functype(GetWallpaperWindowSize)>::Function);
 
 	if (luaL_dofile(L, "main.lua"))
 	{
@@ -182,7 +142,7 @@ int main(int argc, char* argv[])
 		return 1;
 	}
 
-	Lua_CallFunction(L, "Main");
+	Lua::CallFunction(L, "Main");
 
 
 	while (isRunning) {
@@ -242,7 +202,7 @@ int main(int argc, char* argv[])
 						break;
 					}
 					std::cout << "reloaded" << std::endl;
-					Lua_CallFunction(L, "Main");
+					Lua::CallFunction(L, "Main");
 				}
 				break;
 
@@ -256,9 +216,9 @@ int main(int argc, char* argv[])
 		if (animation)
 		{
 			wall.Clear();
-			Lua_CallFunction(L, "OnUpdate", delta);
+			Lua::CallFunction(L, "OnUpdate", delta);
 			wall.Update();
-			Lua_CallFunction(L, "OnFrame", delta);
+			Lua::CallFunction(L, "OnFrame", delta);
 			wall.Render();
 		}
 
