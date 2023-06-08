@@ -62,7 +62,7 @@ function OnUpdate(delta)
 end
 
 function OnFrame(delta)
-    SetColor(255, 255, 255, 255)
+    SetColor(255, 255, 0, 255)
     for i, star in ipairs(stars) do
         DrawStar(star)
     end

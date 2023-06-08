@@ -84,37 +84,6 @@ namespace Lua
 		lua_call(l, n, 0);
 	}
 
-
-
-	//template<typename TReturn, typename ...TArgs>
-	// using Func = (TReturn (TArgs...);
-
-	//template<class>
-	//class LuaFunc;
-
-	//template<typename TReturn, typename ...TArgs>
-	//class LuaFunc<TReturn(TArgs...)>;
-	//
-
-
-	//template<typename TReturn, typename ...TArgs>
-	//class LuaFunc<int(lua_State*)>
-	//{
-	//	typedef TReturn _Func(TArgs...);
-	//public:
-	//	LuaFunc(_Func func) : _func(func)
-	//	{
-	//
-	//	}
-	//
-	//	int operator()(lua_State* l)
-	//	{
-	//
-	//	}
-	//private:
-	//	const _Func _func;
-	//};
-
 	template<typename T>
 	T GetArg(lua_State* l, size_t Index);
 
