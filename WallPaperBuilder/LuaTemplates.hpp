@@ -229,7 +229,7 @@ namespace Lua
 	};
 
 
-	template<typename Fn, Fn fn, typename ...TArgs>
+	template<auto fn, typename ...TArgs>
 	struct CFunctionWrapper
 	{
 		static_assert(std::is_invocable<decltype(fn), TArgs...>::value, "Given function can't be called with such arguments!");
@@ -262,7 +262,4 @@ namespace Lua
 			return fn(std::get<Is>(args)...);
 		}
 	};
-
-#define functype(f) decltype(f), f
-
 }

@@ -140,6 +140,10 @@
     <ClInclude Include="WallPaper.hpp" />
     <ClInclude Include="Window.hpp" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="main.lua" />
+    <None Include="meta.lua" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

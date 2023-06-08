@@ -126,10 +126,10 @@ int main(int argc, char* argv[])
 
 	Lua::RegisterFunction(L, "DoubleInt", Lua::FunctionWrapper<Callable, int, int>::Function);
 	Lua::RegisterFunction(L, "TripleInt", Lua::FunctionWrapper<Callable, int, int, int>::Function);
-	Lua::RegisterFunction(L, "SetColor", Lua::CFunctionWrapper<functype(SetColor), Uint8, Uint8, Uint8, Uint8>::Function);
-	Lua::RegisterFunction(L, "DrawRect", Lua::CFunctionWrapper<functype(DrawRect), float, float, float, float>::Function);
-	Lua::RegisterFunction(L, "DrawLine", Lua::CFunctionWrapper<functype(DrawLine), float, float, float, float>::Function);
-	Lua::RegisterFunction(L, "GetWindowSize", Lua::CFunctionWrapper<functype(GetWallpaperWindowSize)>::Function);
+	Lua::RegisterFunction(L, "SetColor", Lua::CFunctionWrapper<SetColor, Uint8, Uint8, Uint8, Uint8>::Function);
+	Lua::RegisterFunction(L, "DrawRect", Lua::CFunctionWrapper<DrawRect, float, float, float, float>::Function);
+	Lua::RegisterFunction(L, "DrawLine", Lua::CFunctionWrapper<DrawLine, float, float, float, float>::Function);
+	Lua::RegisterFunction(L, "GetWindowSize", Lua::CFunctionWrapper<GetWallpaperWindowSize>::Function);
 
 	if (luaL_dofile(L, "main.lua"))
 	{
