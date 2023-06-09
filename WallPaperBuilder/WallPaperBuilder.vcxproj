@@ -132,11 +132,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="TrayIcon.cpp" />
     <ClCompile Include="WallPaper.cpp" />
     <ClCompile Include="Window.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="LuaTemplates.hpp" />
+    <ClInclude Include="TrayIcon.h" />
     <ClInclude Include="WallPaper.hpp" />
     <ClInclude Include="Window.hpp" />
   </ItemGroup>

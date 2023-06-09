@@ -1,5 +1,6 @@
 #pragma once
 #include <windows.h>
+#include <SDL2/SDL_syswm.h>
 #include <SDL2/SDL_image.h>
 
 
@@ -34,7 +35,7 @@ namespace App
 				w,
 				h,
 				flags
-				);
+			);
 
 			m_renderer = SDL_CreateRenderer(m_window, -1, SDL_RENDERER_ACCELERATED);
 
@@ -84,6 +85,8 @@ namespace App
 		{
 			return m_renderer;
 		}
+
+		SDL_SysWMinfo GetWMInfo();
 
 		~Window()
 		{

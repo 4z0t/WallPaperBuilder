@@ -9,6 +9,7 @@
 #include <SDL2/SDL_timer.h>
 #include "WallPaper.hpp"
 #include "LuaTemplates.hpp"
+#include "TrayIcon.h"
 #undef main
 #define FPS 60
 #define frameDelay (1000 / FPS)
@@ -92,32 +93,14 @@ int main(int argc, char* argv[])
 
 	App::WallPaper wall;
 
+	App::TrayIcon icon(ui.GetWMInfo(), WM_USER + 1, L"WallPaper");
+
 	global_renderer = wall.GetRenderer();
 	wallpaper_window = wall.GetWindow();
 
 
 	bool isHidden = true;
 
-
-	HWND id = 0;
-	{
-		SDL_SysWMinfo info;
-		SDL_VERSION(&info.version);
-
-		NOTIFYICONDATA icon;
-		if (SDL_GetWindowWMInfo(ui.GetWindow(), &info))
-		{
-			id = info.info.win.window;
-			icon.uCallbackMessage = WM_USER + 1;
-			icon.uFlags = NIF_ICON | NIF_TIP | NIF_MESSAGE;
-			icon.hIcon = LoadIcon(NULL, IDI_INFORMATION);
-			icon.cbSize = sizeof(icon);
-			icon.hWnd = id;
-			wcscpy_s(icon.szTip, L"AAA");
-
-			bool success = Shell_NotifyIcon(NIM_ADD, &icon);
-		}
-	}
 
 	bool animation = true;
 	SDL_EventState(SDL_SYSWMEVENT, SDL_ENABLE);
@@ -220,22 +203,6 @@ int main(int argc, char* argv[])
 		FPSCap(startingTick);
 	}
 
-	{
-		SDL_SysWMinfo info;
-		SDL_VERSION(&info.version);
-
-		NOTIFYICONDATA icon;
-		if (SDL_GetWindowWMInfo(ui.GetWindow(), &info))
-		{
-			icon.uCallbackMessage = NULL;
-			icon.uFlags = NIF_ICON;
-			icon.hIcon = NULL;
-			icon.uID = NULL;
-			icon.hWnd = id;
-			wcscpy_s(icon.szTip, L"Test tip");
-			bool success = Shell_NotifyIcon(NIM_DELETE, &icon);
-		}
-	}
 
 	global_renderer = nullptr;
 	lua_close(L);
