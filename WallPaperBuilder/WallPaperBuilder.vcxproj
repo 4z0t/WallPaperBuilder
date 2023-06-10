@@ -137,6 +137,7 @@
     <ClCompile Include="Window.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="LuaState.hpp" />
     <ClInclude Include="LuaTemplates.hpp" />
     <ClInclude Include="TrayIcon.h" />
     <ClInclude Include="WallPaper.hpp" />

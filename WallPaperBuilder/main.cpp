@@ -9,6 +9,7 @@
 #include <SDL2/SDL_timer.h>
 #include "WallPaper.hpp"
 #include "LuaTemplates.hpp"
+#include "LuaState.hpp"
 #include "TrayIcon.h"
 #undef main
 #define FPS 60
@@ -75,8 +76,7 @@ public:
 int main(int argc, char* argv[])
 {
 	using namespace std;
-	lua_State* L;
-	L = luaL_newstate();
+	lua_State* L = luaL_newstate();
 	luaL_openlibs(L);
 
 	uint32_t startingTick = 0;
