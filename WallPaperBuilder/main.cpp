@@ -41,7 +41,6 @@ void DrawLine(float x1, float y1, float x2, float y2)
 {
 	if (!global_renderer) return;
 
-	SDL_SetRenderDrawColor(global_renderer, 255, 255, 255, 255);
 	SDL_RenderDrawLineF(global_renderer, x1, y1, x2, y2);
 }
 
