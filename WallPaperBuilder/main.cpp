@@ -73,14 +73,12 @@ public:
 	}
 };
 
-
+template<typename T>
 struct MakeArray
 {
-
-	std::vector<int> operator()(int n)
+	std::vector<T> operator()(int n)
 	{
-		std::vector<int> res(n);
-		return res;
+		return std::vector<T>(n);
 	}
 };
 
@@ -119,7 +117,7 @@ int main(int argc, char* argv[])
 	SDL_Event e;
 	bool isRunning = true;
 
-	Lua::RegisterFunction(L, "MakeArray", Lua::FunctionWrapper<MakeArray, int>::Function);
+	Lua::RegisterFunction(L, "MakeArray", Lua::FunctionWrapper<MakeArray<int>, int>::Function);
 	Lua::RegisterFunction(L, "DoubleInt", Lua::FunctionWrapper<Callable, int, int>::Function);
 	Lua::RegisterFunction(L, "TripleInt", Lua::FunctionWrapper<Callable, int, int, int>::Function);
 	Lua::RegisterFunction(L, "SetColor", Lua::CFunctionWrapper<SetColor, Uint8, Uint8, Uint8, Uint8>::Function);
