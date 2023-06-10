@@ -4,6 +4,7 @@
 #include <iostream>
 #include <stdlib.h>
 #include <tuple>
+#include <vector>
 #include <lua.hpp>
 #include <SDL2/SDL_syswm.h>
 #include <SDL2/SDL_timer.h>
@@ -72,10 +73,19 @@ public:
 	}
 };
 
-int main(int argc, char* argv[])
+
+struct MakeArray
 {
 
-//	Lua::DefaultValues<2, '4', 6>::Get<0>();
+	std::vector<int> operator()(int n)
+	{
+		std::vector<int> res(n);
+		return res;
+	}
+};
+
+int main(int argc, char* argv[])
+{
 
 	using namespace std;
 	lua_State* L = luaL_newstate();
@@ -109,6 +119,7 @@ int main(int argc, char* argv[])
 	SDL_Event e;
 	bool isRunning = true;
 
+	Lua::RegisterFunction(L, "MakeArray", Lua::FunctionWrapper<MakeArray, int>::Function);
 	Lua::RegisterFunction(L, "DoubleInt", Lua::FunctionWrapper<Callable, int, int>::Function);
 	Lua::RegisterFunction(L, "TripleInt", Lua::FunctionWrapper<Callable, int, int, int>::Function);
 	Lua::RegisterFunction(L, "SetColor", Lua::CFunctionWrapper<SetColor, Uint8, Uint8, Uint8, Uint8>::Function);

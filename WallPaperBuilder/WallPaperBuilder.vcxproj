@@ -107,7 +107,7 @@
       <LanguageStandard>stdcpp17</LanguageStandard>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EntryPointSymbol>mainCRTStartup</EntryPointSymbol>
     </Link>
@@ -140,6 +140,7 @@
     <ClInclude Include="LuaState.hpp" />
     <ClInclude Include="LuaTemplates.hpp" />
     <ClInclude Include="TrayIcon.h" />
+    <ClInclude Include="Utility.hpp" />
     <ClInclude Include="WallPaper.hpp" />
     <ClInclude Include="Window.hpp" />
   </ItemGroup>

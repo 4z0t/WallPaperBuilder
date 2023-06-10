@@ -6,6 +6,7 @@
 #include <string>
 #include <type_traits>
 #include <utility>
+#include <vector>
 
 
 namespace Lua
@@ -117,8 +118,6 @@ namespace Lua
 		return luaL_checkstring(l, Index);
 	}
 
-
-
 	template<size_t N, typename TArgsTuple>
 	constexpr size_t GetArgs(lua_State* l, TArgsTuple& args)
 	{
@@ -132,8 +131,6 @@ namespace Lua
 		std::get<N>(args) = GetArg<TArg>(l, N + 1);
 		return GetArgs<N + 1, TArgsTuple, TArgs...>(l, args);
 	}
-
-
 
 
 	template<size_t Index, typename TResult>
@@ -152,12 +149,25 @@ namespace Lua
 
 
 	template<typename T>
-	inline void _PushResult(lua_State* l, T result);
+	inline void _PushResult(lua_State* l, T result)
+	{
+		_PushValue<T>(l, result);
+	}
+
+	template<typename T>
+	inline void _PushResult(lua_State* l, std::vector<T>& result)
+	{
+		lua_createtable(l, result.size(), 0);
+		for (size_t i = 0; i < result.size(); i++) {
+			_PushValue<T>(l, result[i]);
+			lua_rawseti(l, -2, i + 1);
+		}
+	}
 
 	template<typename T>
 	inline size_t PushResult(lua_State* l, T result)
 	{
-		_PushResult<T>(l, result);
+		_PushResult(l, result);
 		return 1;
 	}
 
@@ -166,31 +176,6 @@ namespace Lua
 	inline size_t PushResult(lua_State* l, std::tuple<Ts...>& result)
 	{
 		return _PushResult<0, std::tuple<Ts...>, Ts...>(l, result);
-	}
-
-	template<>
-	inline  void _PushResult(lua_State* l, int result)
-	{
-		lua_pushinteger(l, result);
-	}
-
-	template<>
-	inline void _PushResult(lua_State* l, double result)
-	{
-		lua_pushnumber(l, result);
-	}
-
-	template<>
-	inline void _PushResult(lua_State* l, float result)
-	{
-		_PushResult<double>(l, result);
-	}
-
-
-	template<>
-	inline void _PushResult(lua_State* l, const char* result)
-	{
-		lua_pushstring(l, result);
 	}
 
 	template<typename FnClass, typename ...TArgs>
@@ -263,37 +248,6 @@ namespace Lua
 		}
 	};
 
-	template<size_t N, auto value, auto ...values>
-	class _DefaultValues;
-
-	template<size_t N>
-	class _DefaultValues {};
-
-
-	template<size_t N, auto value, auto ...values>
-	class _DefaultValues : public _DefaultValues<N + 1, values...>
-	{
-	public:
-		template<size_t Index>
-		static inline auto Get()
-		{
-			if constexpr (N == Index)
-				return value;
-			return _DefaultValues<N+1, values...>::Get();
-		}
-	};
-
-	template<auto ...values>
-	class DefaultValues: public _DefaultValues<0, values...>
-	{
-		using Base = _DefaultValues<0, values...>;
-	public:
-		/*template<size_t Index>
-		static inline auto Get()
-		{
-			return Base::Get<Index>();
-		}*/
-	};
 
 
 

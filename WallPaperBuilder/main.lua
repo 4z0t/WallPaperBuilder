@@ -26,7 +26,11 @@ function DrawStar(star)
 end
 
 function Main()
-    
+    local t = MakeArray(10)
+    print(#t)
+    for i = 1, #t do
+        print(t[i])
+    end
     print(DoubleInt(2, 3))
     w, h = GetWindowSize()
     print(w, h)
