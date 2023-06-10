@@ -51,6 +51,7 @@ namespace Lua
 		~State()
 		{
 			m_state->Close();
+			m_state = nullptr;
 		}
 
 
