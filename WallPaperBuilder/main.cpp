@@ -74,6 +74,9 @@ public:
 
 int main(int argc, char* argv[])
 {
+
+//	Lua::DefaultValues<2, '4', 6>::Get<0>();
+
 	using namespace std;
 	lua_State* L = luaL_newstate();
 	luaL_openlibs(L);
@@ -120,7 +123,6 @@ int main(int argc, char* argv[])
 	}
 
 	Lua::CallFunction(L, "Main");
-
 
 	while (isRunning) {
 
