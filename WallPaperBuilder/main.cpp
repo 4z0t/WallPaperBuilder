@@ -12,7 +12,7 @@
 #include "LuaTemplates.hpp"
 #include "LuaState.hpp"
 #include "TrayIcon.h"
-
+#include "Tests.hpp"
 //#include "Utility.hpp"
 
 #undef main
@@ -90,6 +90,8 @@ int main(int argc, char* argv[])
 	using namespace std;
 	lua_State* L = luaL_newstate();
 	luaL_openlibs(L);
+
+	Test(L);
 
 	uint32_t startingTick = 0;
 

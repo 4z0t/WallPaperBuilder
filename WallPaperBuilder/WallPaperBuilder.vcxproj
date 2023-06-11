@@ -139,6 +139,7 @@
   <ItemGroup>
     <ClInclude Include="LuaState.hpp" />
     <ClInclude Include="LuaTemplates.hpp" />
+    <ClInclude Include="Tests.hpp" />
     <ClInclude Include="TrayIcon.h" />
     <ClInclude Include="Utility.hpp" />
     <ClInclude Include="WallPaper.hpp" />
