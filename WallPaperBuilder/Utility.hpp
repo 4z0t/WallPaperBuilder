@@ -7,7 +7,7 @@ namespace Utility
 	class _DefaultValues;
 
 
-	template<size_t N, auto value, auto ...values>
+	template<size_t N, const  auto value, const  auto ...values>
 	class _DefaultValues : public _DefaultValues<N + 1, values...>
 	{
 		using Base = _DefaultValues<N + 1, values...>;
@@ -21,7 +21,7 @@ namespace Utility
 		}
 	};
 
-	template<auto ...values>
+	template<const auto ...values>
 	class DefaultValues : public _DefaultValues<0, values...>
 	{
 		using Base = _DefaultValues<0, values...>;

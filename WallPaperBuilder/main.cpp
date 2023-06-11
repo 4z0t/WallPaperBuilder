@@ -12,6 +12,9 @@
 #include "LuaTemplates.hpp"
 #include "LuaState.hpp"
 #include "TrayIcon.h"
+
+//#include "Utility.hpp"
+
 #undef main
 #define FPS 60
 #define frameDelay (1000 / FPS)
@@ -84,7 +87,6 @@ struct MakeArray
 
 int main(int argc, char* argv[])
 {
-
 	using namespace std;
 	lua_State* L = luaL_newstate();
 	luaL_openlibs(L);
