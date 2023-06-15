@@ -85,6 +85,14 @@ namespace Lua
 		lua_call(l, n, 0);
 	}
 
+	template<typename ...Ts>
+	bool CallFunctionProtected(lua_State* l, const char* name, const Ts&... args)
+	{
+		lua_getglobal(l, name);
+		size_t n = _PushArgs<0, Ts...>(l, args...);
+		return lua_pcall(l, n, 0, 0) == LUA_OK;
+	}
+
 	template<typename T>
 	T GetArg(lua_State* l, size_t Index);
 

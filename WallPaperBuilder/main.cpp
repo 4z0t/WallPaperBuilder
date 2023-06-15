@@ -208,9 +208,17 @@ int main(int argc, char* argv[])
 		if (animation)
 		{
 			wall.Clear();
-			Lua::CallFunction(L, "OnUpdate", delta);
+			if (!Lua::CallFunctionProtected(L, "OnUpdate", delta))
+			{
+				std::cerr << "OnUpdate failed: " << lua_tostring(L, -1) << std::endl;
+				break;
+			}
 			wall.Update();
-			Lua::CallFunction(L, "OnFrame", delta);
+			if (!Lua::CallFunctionProtected(L, "OnFrame", delta))
+			{
+				std::cerr << "OnFrame failed: " << lua_tostring(L, -1) << std::endl;
+				break;
+			}
 			wall.Render();
 		}
 
