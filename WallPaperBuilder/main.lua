@@ -37,6 +37,9 @@ function Test()
     local tc = TestClass.new()
     tc:print()
     tc:aboba()
+    PrintInc()
+    PrintInc()
+    PrintInc()
 end
 
 function Main()

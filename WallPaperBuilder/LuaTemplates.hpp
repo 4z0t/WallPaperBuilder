@@ -151,6 +151,19 @@ namespace Lua
 		return GetArgs<N + 1, TArgsTuple, TArgs...>(l, args);
 	}
 
+	template<size_t N, typename TArgsTuple>
+	constexpr size_t GetUpvalue(lua_State* l, TArgsTuple& args)
+	{
+		return N;
+	}
+
+	template<size_t N, typename TArgsTuple, typename TArg, typename ...TArgs>
+	constexpr size_t GetUpvalue(lua_State* l, TArgsTuple& args)
+	{
+		std::get<N>(args) = GetArg<TArg>(l, lua_upvalueindex(N + 1));
+		return GetArgs<N + 1, TArgsTuple, TArgs...>(l, args);
+	}
+
 
 	template<size_t Index, typename TResult>
 	inline size_t _PushResult(lua_State* l, TResult& result)
@@ -273,6 +286,49 @@ namespace Lua
 			return fn(std::get<Is>(args)...);
 		}
 	};
+
+
+
+	template<auto fn, template<typename ...CArgs> typename Upvalues, typename ...TArgs>
+	struct CClosureWrapper
+	{
+
+		using ArgsTupleT = std::tuple<TArgs...>;
+		using Indexes = std::index_sequence_for<TArgs...>;
+
+	public:
+		template<typename ...CArgs>
+		static int Function(lua_State* l)
+		{
+			using namespace std;
+			static_assert(std::is_invocable<decltype(fn), Upvalues<CArgs...>&, TArgs...>::value, "Given function can't be called with such arguments!");
+			using TReturn = typename std::invoke_result<decltype(fn), Upvalues<CArgs...>&, TArgs...>::type;
+
+			Upvalues<CArgs...> upvalues;
+			GetUpvalue<0, Upvalues<CArgs...>, CArgs...>(l, upvalues);
+			ArgsTupleT args;
+			GetArgs<0, ArgsTupleT, TArgs ...>(l, args);
+			if constexpr (std::is_void<TReturn>::value)
+			{
+				CClosureWrapper::CallHelper(upvalues, args, Indexes{});
+				return 0;
+			}
+			else
+			{
+				TReturn result = CClosureWrapper::CallHelper(upvalues, args, Indexes{});
+				size_t n_results = PushResult(l, result);
+				return n_results;
+			}
+		}
+	private:
+		template <std::size_t ... Is, typename ...CArgs>
+		static typename std::invoke_result<decltype(fn), Upvalues<CArgs...>&, TArgs...>::type CallHelper(Upvalues<CArgs...>& upvalues, ArgsTupleT& args, std::index_sequence<Is...> const)
+		{
+			return fn(upvalues, std::get<Is>(args)...);
+		}
+	};
+
+
 
 
 	/*void luaL_openlib(lua_State* L, const char* name, const luaL_Reg* reg, int nup)
