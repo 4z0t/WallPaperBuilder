@@ -287,7 +287,28 @@ namespace Lua
 		}
 	};
 
+	template<size_t Index, typename TResult>
+	constexpr size_t _ReplaceUpvalue(lua_State* l, TResult& upvalues)
+	{
+		return Index;
+	}
 
+	template<size_t Index, typename TResult, typename T, typename ...Ts>
+	inline size_t _ReplaceUpvalue(lua_State* l, TResult& upvalues)
+	{
+		if constexpr (!std::is_pointer<T>::value)
+		{
+			_PushValue<T>(l, std::get<Index>(upvalues));
+			lua_replace(l, lua_upvalueindex(Index + 1));
+		}
+		return _ReplaceUpvalue<Index + 1, TResult, Ts...>(l, upvalues);
+	}
+
+	template<typename ...CArgs>
+	void ReplaceUpvalues(lua_State* l, std::tuple<CArgs...>& upvalues)
+	{
+		_ReplaceUpvalue<0, std::tuple<CArgs...>, CArgs...>(l, upvalues);
+	}
 
 	template<auto fn, template<typename ...CArgs> typename Upvalues, typename ...TArgs>
 	struct CClosureWrapper
@@ -311,11 +332,13 @@ namespace Lua
 			if constexpr (std::is_void<TReturn>::value)
 			{
 				CClosureWrapper::CallHelper(upvalues, args, Indexes{});
+				ReplaceUpvalues(l, upvalues);
 				return 0;
 			}
 			else
 			{
 				TReturn result = CClosureWrapper::CallHelper(upvalues, args, Indexes{});
+				ReplaceUpvalues(l, upvalues);
 				size_t n_results = PushResult(l, result);
 				return n_results;
 			}
