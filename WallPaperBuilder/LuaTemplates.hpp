@@ -18,6 +18,8 @@ namespace Lua
 		lua_setglobal(l, name);
 	}
 
+
+
 	template<typename T>
 	inline void _PushValue(lua_State* l, T arg);
 
@@ -91,6 +93,15 @@ namespace Lua
 		lua_getglobal(l, name);
 		size_t n = _PushArgs<0, Ts...>(l, args...);
 		return lua_pcall(l, n, 0, 0) == LUA_OK;
+	}
+
+
+	template<typename ...Ts>
+	void RegisterClosure(lua_State* l, const char* name, lua_CFunction func, const Ts&... args)
+	{
+		size_t n = _PushArgs<0, Ts...>(l, args...);
+		lua_pushcclosure(l, func, n);
+		lua_setglobal(l, name);
 	}
 
 	template<typename T>
@@ -298,6 +309,7 @@ namespace Lua
 			lua_setglobal(l, name);
 		}
 	};
+
 
 
 }
