@@ -14,48 +14,54 @@
 #include "LuaTemplates.hpp"
 #include "LuaState.hpp"
 
-struct TestClass;
 
-struct TestClass
+
+
+namespace Tests
 {
-	static const char* className;
-
-
-	static int Print(lua_State* l)
+	struct TestClass
 	{
-		std::cout << "Hello!" << std::endl;
-		return 0;
-	}
+		static const char* className;
 
 
-	static int Create(lua_State* l)
-	{
-		size_t nbytes = sizeof(TestClass);
-		TestClass* a = (TestClass*)lua_newuserdata(l, nbytes);
+		static int Print(lua_State* l)
+		{
+			std::cout << "Hello!" << std::endl;
 
-		luaL_getmetatable(l, TestClass::className);
-		lua_setmetatable(l, -2);
-
-		return 1;  /* new userdatum is already on the stack */
-	}
+			return 0;
+		}
 
 
-	inline static const luaL_Reg meta[] = {
-		{"print", TestClass::Print},
-		{"aboba", TestClass::Print},
-		{NULL, NULL}
+		static int Create(lua_State* l)
+		{
+			size_t nbytes = sizeof(TestClass);
+			TestClass* a = (TestClass*)lua_newuserdata(l, nbytes);
+
+			luaL_getmetatable(l, TestClass::className);
+			lua_setmetatable(l, -2);
+
+			return 1;  /* new userdatum is already on the stack */
+		}
+
+
+		inline static const luaL_Reg meta[] = {
+			{"print", TestClass::Print},
+			{"aboba", TestClass::Print},
+			{NULL, NULL}
+		};
+
+		inline static const luaL_Reg _class[] = {
+			{"new", TestClass::Create},
+			{NULL, NULL}
+		};
 	};
 
-	inline static const luaL_Reg _class[] = {
-		{"new", TestClass::Create},
-		{NULL, NULL}
-	};
-};
+	const char* TestClass::className = typeid(TestClass).name();
 
-const char*  TestClass::className = typeid(TestClass).name();
-
+}
 void Test(lua_State* l)
 {
+	using namespace Tests;
 	Lua::ClassWrapper<TestClass>::Init(l, "TestClass", TestClass::_class);
 
 	std::cout << TestClass::className << std::endl;

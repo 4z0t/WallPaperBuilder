@@ -101,7 +101,6 @@ int main(int argc, char* argv[])
 
 	uint32_t startingTick = 0;
 
-
 	App::Window ui(
 		"title",
 		SDL_WINDOWPOS_CENTERED,
