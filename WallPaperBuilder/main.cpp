@@ -98,6 +98,11 @@ void PrintClosureNumber(std::tuple<int, float>& upvalues)
 	std::cout << "Value is " << std::get<0>(upvalues) << " " << std::get<1>(upvalues) << std::endl;
 }
 
+void Say(std::tuple<const char*>& upvalues)
+{
+	std::cout << "Value is " << std::get<0>(upvalues) << std::endl;
+}
+
 int main(int argc, char* argv[])
 {
 	using namespace std;
@@ -141,6 +146,8 @@ int main(int argc, char* argv[])
 	Lua::RegisterFunction(L, "DrawLine", Lua::CFunctionWrapper<DrawLine, float, float, float, float>::Function);
 	Lua::RegisterFunction(L, "GetWindowSize", Lua::CFunctionWrapper<GetWallpaperWindowSize>::Function);
 	Lua::RegisterClosure(L, "PrintInc", Lua::CClosureWrapper<PrintClosureNumber, std::tuple>::Function<int, float>, 0, 0.0f);
+	Lua::RegisterClosure(L, "SayHello", Lua::CClosureWrapper<Say, std::tuple>::Function<const char*>, "Hello!");
+	Lua::RegisterClosure(L, "SayBye", Lua::CClosureWrapper<Say, std::tuple>::Function<const char*>, "Bye!");
 
 	if (luaL_dofile(L, "main.lua"))
 	{

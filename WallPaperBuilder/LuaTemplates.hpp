@@ -19,10 +19,24 @@ namespace Lua
 	}
 
 
+	template<typename T>
+	inline void _PushValue(lua_State* l, const T* arg);
+
+	template<>
+	inline void _PushValue(lua_State* l, const char* arg)
+	{
+		lua_pushstring(l, arg);
+	}
 
 	template<typename T>
 	inline void _PushValue(lua_State* l, T arg);
 
+
+	/*template<size_t N>
+	inline void _PushValue(lua_State* l, const char arg[N])
+	{
+		lua_pushstring(l, arg);
+	}*/
 
 	template<>
 	inline void _PushValue(lua_State* l, lua_Integer arg)
@@ -48,11 +62,6 @@ namespace Lua
 		_PushValue<lua_Number>(l, static_cast<lua_Number> (arg));
 	}
 
-	template<>
-	inline void _PushValue(lua_State* l, const char* arg)
-	{
-		lua_pushstring(l, arg);
-	}
 
 	template<>
 	inline void _PushValue(lua_State* l, std::nullptr_t arg)
@@ -81,7 +90,7 @@ namespace Lua
 	template<size_t N, typename T>
 	size_t _PushArgs(lua_State* l, const T& arg)
 	{
-		_PushValue<T>(l, arg);
+		_PushValue(l, arg);
 		return N + 1;
 	}
 

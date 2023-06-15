@@ -40,6 +40,9 @@ function Test()
     PrintInc()
     PrintInc()
     PrintInc()
+
+    SayHello()
+    SayBye()
 end
 
 function Main()
