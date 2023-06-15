@@ -91,10 +91,11 @@ struct MakeArray
 	}
 };
 
-void PrintClosureNumber(std::tuple<int>& upvalues)
+void PrintClosureNumber(std::tuple<int, float>& upvalues)
 {
 	std::get<0>(upvalues)++;
-	std::cout << "Value is " << std::get<0>(upvalues) << std::endl;
+	std::get<1>(upvalues) += 0.1;
+	std::cout << "Value is " << std::get<0>(upvalues) << " " << std::get<1>(upvalues) << std::endl;
 }
 
 int main(int argc, char* argv[])
@@ -139,7 +140,7 @@ int main(int argc, char* argv[])
 	Lua::RegisterFunction(L, "DrawRect", Lua::CFunctionWrapper<DrawRect, float, float, float, float>::Function);
 	Lua::RegisterFunction(L, "DrawLine", Lua::CFunctionWrapper<DrawLine, float, float, float, float>::Function);
 	Lua::RegisterFunction(L, "GetWindowSize", Lua::CFunctionWrapper<GetWallpaperWindowSize>::Function);
-	Lua::RegisterClosure(L, "PrintInc", Lua::CClosureWrapper<PrintClosureNumber, std::tuple>::Function<int>, 0);
+	Lua::RegisterClosure(L, "PrintInc", Lua::CClosureWrapper<PrintClosureNumber, std::tuple>::Function<int, float>, 0, 0.0f);
 
 	if (luaL_dofile(L, "main.lua"))
 	{

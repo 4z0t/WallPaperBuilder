@@ -43,6 +43,12 @@ namespace Lua
 	}
 
 	template<>
+	inline void _PushValue(lua_State* l, float arg)
+	{
+		_PushValue<lua_Number>(l, static_cast<lua_Number> (arg));
+	}
+
+	template<>
 	inline void _PushValue(lua_State* l, const char* arg)
 	{
 		lua_pushstring(l, arg);
@@ -161,7 +167,7 @@ namespace Lua
 	constexpr size_t GetUpvalue(lua_State* l, TArgsTuple& args)
 	{
 		std::get<N>(args) = GetArg<TArg>(l, lua_upvalueindex(N + 1));
-		return GetArgs<N + 1, TArgsTuple, TArgs...>(l, args);
+		return GetUpvalue<N + 1, TArgsTuple, TArgs...>(l, args);
 	}
 
 
