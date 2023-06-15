@@ -65,6 +65,12 @@ void FPSCap(Uint32 starting_tick) {
 class Callable
 {
 public:
+
+	Callable(lua_State* l)
+	{
+		std::cout << "called with lua state in it" << std::endl;
+	}
+
 	int operator()(int a, int b)
 	{
 		return a * a + b;

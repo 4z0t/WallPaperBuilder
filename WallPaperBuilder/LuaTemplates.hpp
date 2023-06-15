@@ -203,21 +203,28 @@ namespace Lua
 
 			if constexpr (std::is_void<TReturn>::value)
 			{
-				FunctionWrapper::CallHelper(args, Indexes{});
+				FunctionWrapper::CallHelper(l, args, Indexes{});
 				return 0;
 			}
 			else
 			{
-				TReturn result = FunctionWrapper::CallHelper(args, Indexes{});
+				TReturn result = FunctionWrapper::CallHelper(l, args, Indexes{});
 				size_t n_results = PushResult(l, result);
 				return n_results;
 			}
 		}
 	private:
 		template <std::size_t ... Is>
-		static TReturn CallHelper(ArgsTupleT& args, std::index_sequence<Is...> const)
+		static TReturn CallHelper(lua_State* l, ArgsTupleT& args, std::index_sequence<Is...> const)
 		{
-			return FnClass{}(std::get<Is>(args)...);
+			if constexpr (std::is_constructible<FnClass, lua_State*>::value)
+			{
+				return FnClass{ l }(std::get<Is>(args)...);
+			}
+			else
+			{
+				return FnClass{}(std::get<Is>(args)...);
+			}
 		}
 	};
 
