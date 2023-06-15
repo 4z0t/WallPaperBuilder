@@ -83,7 +83,7 @@ namespace Lua
 	template<size_t N, typename T, typename ...Ts>
 	size_t _PushArgs(lua_State* l, const T& arg, const Ts&... args)
 	{
-		_PushValue<T>(l, arg);
+		_PushValue(l, arg);
 		return _PushArgs<N + 1, Ts...>(l, args...);
 	}
 
