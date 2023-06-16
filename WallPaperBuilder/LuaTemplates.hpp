@@ -379,14 +379,49 @@ namespace Lua
 	};
 
 
-
-
-	/*void luaL_openlib(lua_State* L, const char* name, const luaL_Reg* reg, int nup)
+	template<auto fn, typename ...TArgs>
+	struct ClosureWrapper
 	{
-		lua_newtable(L);
-		luaL_setfuncs(L, reg, nup);
-		lua_setglobal(L, name);
-	}*/
+		template<typename ...CArgs>
+		using TReturn = typename std::invoke_result<decltype(fn), CArgs&..., TArgs...>::type;
+		using ArgsTupleT = std::tuple<TArgs...>;
+		using Indexes = std::index_sequence_for<TArgs...>;
+
+	public:
+		template<typename ...CArgs>
+		static int Function(lua_State* l)
+		{
+			using namespace std;
+			static_assert(std::is_invocable<decltype(fn), CArgs&..., TArgs...>::value, "Given function can't be called with such arguments!");
+			using Upvalues = std::tuple<CArgs...>;
+
+			Upvalues upvalues;
+			GetUpvalue<0, Upvalues, CArgs...>(l, upvalues);
+			ArgsTupleT args;
+			GetArgs<0, ArgsTupleT, TArgs ...>(l, args);
+			if constexpr (std::is_void<TReturn<CArgs...>>::value)
+			{
+				ClosureWrapper::CallHelper(upvalues, args, std::index_sequence_for<CArgs...>{}, Indexes{});
+				ReplaceUpvalues(l, upvalues);
+				return 0;
+			}
+			else
+			{
+				TReturn<CArgs...> result = ClosureWrapper::CallHelper(upvalues, args, std::index_sequence_for<CArgs...>{}, Indexes{});
+				ReplaceUpvalues(l, upvalues);
+				size_t n_results = PushResult(l, result);
+				return n_results;
+			}
+		}
+	private:
+		template <std::size_t ... UpIs, typename ...CArgs, std::size_t ... Is>
+		static TReturn<CArgs...> CallHelper(std::tuple<CArgs...>& upvalues, ArgsTupleT& args, std::index_sequence<UpIs...> const, std::index_sequence<Is...> const)
+		{
+			return fn(std::get<UpIs>(upvalues)..., std::get<Is>(args)...);
+		}
+	};
+
+
 
 	constexpr size_t RegisterSize(const struct luaL_Reg* reg)
 	{

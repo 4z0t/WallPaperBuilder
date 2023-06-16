@@ -97,6 +97,14 @@ void PrintClosureNumber(std::tuple<int, float>& upvalues)
 	std::cout << "Value is " << std::get<0>(upvalues) << " " << std::get<1>(upvalues) << std::endl;
 }
 
+void PrintClosureNumber2(int& a, float& b)
+{
+	a++;
+	b += 0.1;
+	std::cout << "Value is " << a << " " << b << std::endl;
+}
+
+
 void Say(std::tuple<const char*>& upvalues)
 {
 	std::cout << "Value is " << std::get<0>(upvalues) << std::endl;
@@ -113,9 +121,10 @@ void Test(lua_State* l)
 	Lua::RegisterFunction(l, "MakeArray", Lua::FunctionWrapper<MakeArray<int>, int>::Function);
 	Lua::RegisterFunction(l, "DoubleInt", Lua::FunctionWrapper<Callable, int, int>::Function);
 	Lua::RegisterFunction(l, "TripleInt", Lua::FunctionWrapper<Callable, int, int, int>::Function);
-	Lua::RegisterClosure(l, "PrintInc", Lua::CClosureWrapper<PrintClosureNumber, std::tuple>::Function<int, float>, 7, 3.2f);
+	//Lua::RegisterClosure(l, "PrintInc", Lua::CClosureWrapper<PrintClosureNumber, std::tuple>::Function<int, float>, 7, 3.2f);
+	Lua::RegisterClosure(l, "PrintInc", Lua::ClosureWrapper<PrintClosureNumber2>::Function<int, float>, 7, 3.2f);
 	Lua::RegisterClosure(l, "SayHello", Lua::CClosureWrapper<Say, std::tuple>::Function<const char*>, "Hello!");
 	Lua::RegisterClosure(l, "SayBye", Lua::CClosureWrapper<Say, std::tuple>::Function<const char*>, "Bye!");
-
+	Lua::RegisterClosure(l, "SayBye", Lua::CClosureWrapper<Say, std::tuple>::Function<const char*>, "Bye!");
 
 }
