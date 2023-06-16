@@ -105,9 +105,9 @@ void PrintClosureNumber2(int& a, float& b)
 }
 
 
-void Say(std::tuple<const char*>& upvalues)
+void Say(const char* str)
 {
-	std::cout << "Value is " << std::get<0>(upvalues) << std::endl;
+	std::cout << "Value is " <<str << std::endl;
 }
 
 
@@ -123,8 +123,7 @@ void Test(lua_State* l)
 	Lua::RegisterFunction(l, "TripleInt", Lua::FunctionWrapper<Callable, int, int, int>::Function);
 	//Lua::RegisterClosure(l, "PrintInc", Lua::CClosureWrapper<PrintClosureNumber, std::tuple>::Function<int, float>, 7, 3.2f);
 	Lua::RegisterClosure(l, "PrintInc", Lua::ClosureWrapper<PrintClosureNumber2>::Function<int, float>, 7, 3.2f);
-	Lua::RegisterClosure(l, "SayHello", Lua::CClosureWrapper<Say, std::tuple>::Function<const char*>, "Hello!");
-	Lua::RegisterClosure(l, "SayBye", Lua::CClosureWrapper<Say, std::tuple>::Function<const char*>, "Bye!");
-	Lua::RegisterClosure(l, "SayBye", Lua::CClosureWrapper<Say, std::tuple>::Function<const char*>, "Bye!");
+	Lua::RegisterClosure(l, "SayHello", Lua::ClosureWrapper<Say>::Function<const char*>, "Hello!");
+	Lua::RegisterClosure(l, "SayBye", Lua::ClosureWrapper<Say>::Function<const char*>, "Bye!");
 
 }
