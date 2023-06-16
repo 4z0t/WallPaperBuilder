@@ -328,7 +328,8 @@ namespace Lua
 	template<auto fn, template<typename ...CArgs> typename Upvalues, typename ...TArgs>
 	struct CClosureWrapper
 	{
-
+		template<typename ...CArgs>
+		using TReturn = typename std::invoke_result<decltype(fn), Upvalues<CArgs...>&, TArgs...>::type;
 		using ArgsTupleT = std::tuple<TArgs...>;
 		using Indexes = std::index_sequence_for<TArgs...>;
 
@@ -338,13 +339,12 @@ namespace Lua
 		{
 			using namespace std;
 			static_assert(std::is_invocable<decltype(fn), Upvalues<CArgs...>&, TArgs...>::value, "Given function can't be called with such arguments!");
-			using TReturn = typename std::invoke_result<decltype(fn), Upvalues<CArgs...>&, TArgs...>::type;
 
 			Upvalues<CArgs...> upvalues;
 			GetUpvalue<0, Upvalues<CArgs...>, CArgs...>(l, upvalues);
 			ArgsTupleT args;
 			GetArgs<0, ArgsTupleT, TArgs ...>(l, args);
-			if constexpr (std::is_void<TReturn>::value)
+			if constexpr (std::is_void<TReturn<CArgs...>>::value)
 			{
 				CClosureWrapper::CallHelper(upvalues, args, Indexes{});
 				ReplaceUpvalues(l, upvalues);
@@ -352,7 +352,7 @@ namespace Lua
 			}
 			else
 			{
-				TReturn result = CClosureWrapper::CallHelper(upvalues, args, Indexes{});
+				TReturn<CArgs...> result = CClosureWrapper::CallHelper(upvalues, args, Indexes{});
 				ReplaceUpvalues(l, upvalues);
 				size_t n_results = PushResult(l, result);
 				return n_results;
@@ -360,7 +360,7 @@ namespace Lua
 		}
 	private:
 		template <std::size_t ... Is, typename ...CArgs>
-		static typename std::invoke_result<decltype(fn), Upvalues<CArgs...>&, TArgs...>::type CallHelper(Upvalues<CArgs...>& upvalues, ArgsTupleT& args, std::index_sequence<Is...> const)
+		static TReturn<CArgs...> CallHelper(Upvalues<CArgs...>& upvalues, ArgsTupleT& args, std::index_sequence<Is...> const)
 		{
 			return fn(upvalues, std::get<Is>(args)...);
 		}
@@ -386,6 +386,7 @@ namespace Lua
 	template<class TClass>
 	class ClassWrapper
 	{
+		//static_assert(std::is_same<decltype(TClass::meta),const luaL_Reg[]>::value);
 		static_assert(TClass::meta != nullptr, "Metatable required");
 	public:
 		static void Init(lua_State* l, const char* name, const struct luaL_Reg class_reg[])
