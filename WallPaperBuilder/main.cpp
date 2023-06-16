@@ -62,46 +62,6 @@ void FPSCap(Uint32 starting_tick) {
 	}
 }
 
-class Callable
-{
-public:
-
-	Callable(lua_State* l)
-	{
-		std::cout << "called with lua state in it" << std::endl;
-	}
-
-	int operator()(int a, int b)
-	{
-		return a * a + b;
-	}
-
-	int operator()(int a, int b, int c)
-	{
-		return a * a + b * c;
-	}
-};
-
-template<typename T>
-struct MakeArray
-{
-	std::vector<T> operator()(int n)
-	{
-		return std::vector<T>(n);
-	}
-};
-
-void PrintClosureNumber(std::tuple<int, float>& upvalues)
-{
-	std::get<0>(upvalues)++;
-	std::get<1>(upvalues) += 0.1;
-	std::cout << "Value is " << std::get<0>(upvalues) << " " << std::get<1>(upvalues) << std::endl;
-}
-
-void Say(std::tuple<const char*>& upvalues)
-{
-	std::cout << "Value is " << std::get<0>(upvalues) << std::endl;
-}
 
 int main(int argc, char* argv[])
 {
@@ -138,16 +98,12 @@ int main(int argc, char* argv[])
 	SDL_Event e;
 	bool isRunning = true;
 
-	Lua::RegisterFunction(L, "MakeArray", Lua::FunctionWrapper<MakeArray<int>, int>::Function);
-	Lua::RegisterFunction(L, "DoubleInt", Lua::FunctionWrapper<Callable, int, int>::Function);
-	Lua::RegisterFunction(L, "TripleInt", Lua::FunctionWrapper<Callable, int, int, int>::Function);
+
 	Lua::RegisterFunction(L, "SetColor", Lua::CFunctionWrapper<SetColor, Uint8, Uint8, Uint8, Uint8>::Function);
 	Lua::RegisterFunction(L, "DrawRect", Lua::CFunctionWrapper<DrawRect, float, float, float, float>::Function);
 	Lua::RegisterFunction(L, "DrawLine", Lua::CFunctionWrapper<DrawLine, float, float, float, float>::Function);
 	Lua::RegisterFunction(L, "GetWindowSize", Lua::CFunctionWrapper<GetWallpaperWindowSize>::Function);
-	Lua::RegisterClosure(L, "PrintInc", Lua::CClosureWrapper<PrintClosureNumber, std::tuple>::Function<int, float>, 0, 0.0f);
-	Lua::RegisterClosure(L, "SayHello", Lua::CClosureWrapper<Say, std::tuple>::Function<const char*>, "Hello!");
-	Lua::RegisterClosure(L, "SayBye", Lua::CClosureWrapper<Say, std::tuple>::Function<const char*>, "Bye!");
+
 
 	if (luaL_dofile(L, "main.lua"))
 	{
