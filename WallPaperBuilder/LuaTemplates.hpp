@@ -94,19 +94,31 @@ namespace Lua
 		return N + 1;
 	}
 
+	template< typename ...Ts>
+	inline size_t PushArgs(lua_State* l, const Ts& ...args)
+	{
+		return _PushArgs<0, Ts...>(l, args...);
+	}
+
+	template<typename ...Ts>
+	inline size_t _PrepareCall(lua_State* l, const char* name, const Ts&... args)
+	{
+		lua_getglobal(l, name);
+		size_t n = PushArgs(l, args...);
+		return n;
+	}
+
 	template<typename ...Ts>
 	void CallFunction(lua_State* l, const char* name, const Ts&... args)
 	{
-		lua_getglobal(l, name);
-		size_t n = _PushArgs<0, Ts...>(l, args...);
+		size_t n = _PrepareCall(l, name, args...);
 		lua_call(l, n, 0);
 	}
 
 	template<typename ...Ts>
 	bool CallFunctionProtected(lua_State* l, const char* name, const Ts&... args)
 	{
-		lua_getglobal(l, name);
-		size_t n = _PushArgs<0, Ts...>(l, args...);
+		size_t n = _PrepareCall(l, name, args...);
 		return lua_pcall(l, n, 0, 0) == LUA_OK;
 	}
 
