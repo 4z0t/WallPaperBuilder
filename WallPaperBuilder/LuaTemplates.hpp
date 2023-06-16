@@ -179,16 +179,16 @@ namespace Lua
 	}
 
 	template<size_t N, typename TArgsTuple>
-	constexpr size_t GetUpvalue(lua_State* l, TArgsTuple& args)
+	constexpr size_t GetUpvalues(lua_State* l, TArgsTuple& args)
 	{
 		return N;
 	}
 
 	template<size_t N, typename TArgsTuple, typename TArg, typename ...TArgs>
-	constexpr size_t GetUpvalue(lua_State* l, TArgsTuple& args)
+	constexpr size_t GetUpvalues(lua_State* l, TArgsTuple& args)
 	{
 		std::get<N>(args) = GetArg<TArg>(l, lua_upvalueindex(N + 1));
-		return GetUpvalue<N + 1, TArgsTuple, TArgs...>(l, args);
+		return GetUpvalues<N + 1, TArgsTuple, TArgs...>(l, args);
 	}
 
 
@@ -353,7 +353,7 @@ namespace Lua
 			static_assert(std::is_invocable<decltype(fn), Upvalues<CArgs...>&, TArgs...>::value, "Given function can't be called with such arguments!");
 
 			Upvalues<CArgs...> upvalues;
-			GetUpvalue<0, Upvalues<CArgs...>, CArgs...>(l, upvalues);
+			GetUpvalues<0, Upvalues<CArgs...>, CArgs...>(l, upvalues);
 			ArgsTupleT args;
 			GetArgs<0, ArgsTupleT, TArgs ...>(l, args);
 			if constexpr (std::is_void<TReturn<CArgs...>>::value)
@@ -396,7 +396,7 @@ namespace Lua
 			using Upvalues = std::tuple<CArgs...>;
 
 			Upvalues upvalues;
-			GetUpvalue<0, Upvalues, CArgs...>(l, upvalues);
+			GetUpvalues<0, Upvalues, CArgs...>(l, upvalues);
 			ArgsTupleT args;
 			GetArgs<0, ArgsTupleT, TArgs ...>(l, args);
 			if constexpr (std::is_void<TReturn<CArgs...>>::value)
