@@ -283,8 +283,9 @@ namespace Lua
 	template<auto fn, typename ...TArgs>
 	struct CFunctionWrapper
 	{
-		static_assert(std::is_invocable<decltype(fn), TArgs...>::value, "Given function can't be called with such arguments!");
-		using TReturn = typename std::invoke_result<decltype(fn), TArgs...>::type;
+		using FnType = decltype(fn);
+		static_assert(std::is_invocable<FnType, TArgs...>::value, "Given function can't be called with such arguments!");
+		using TReturn = typename std::invoke_result<FnType, TArgs...>::type;
 		using ArgsTupleT = std::tuple<TArgs...>;
 		using Indexes = std::index_sequence_for<TArgs...>;
 
@@ -340,8 +341,9 @@ namespace Lua
 	template<auto fn, template<typename ...CArgs> typename Upvalues, typename ...TArgs>
 	struct CClosureWrapper
 	{
+		using FnType = decltype(fn);
 		template<typename ...CArgs>
-		using TReturn = typename std::invoke_result<decltype(fn), Upvalues<CArgs...>&, TArgs...>::type;
+		using TReturn = typename std::invoke_result<FnType, Upvalues<CArgs...>&, TArgs...>::type;
 		using ArgsTupleT = std::tuple<TArgs...>;
 		using Indexes = std::index_sequence_for<TArgs...>;
 
@@ -350,7 +352,7 @@ namespace Lua
 		static int Function(lua_State* l)
 		{
 			using namespace std;
-			static_assert(std::is_invocable<decltype(fn), Upvalues<CArgs...>&, TArgs...>::value, "Given function can't be called with such arguments!");
+			static_assert(std::is_invocable<FnType, Upvalues<CArgs...>&, TArgs...>::value, "Given function can't be called with such arguments!");
 
 			Upvalues<CArgs...> upvalues;
 			GetUpvalues<0, Upvalues<CArgs...>, CArgs...>(l, upvalues);
@@ -382,8 +384,9 @@ namespace Lua
 	template<auto fn, typename ...TArgs>
 	struct ClosureWrapper
 	{
+		using FnType = decltype(fn);
 		template<typename ...CArgs>
-		using TReturn = typename std::invoke_result<decltype(fn), CArgs&..., TArgs...>::type;
+		using TReturn = typename std::invoke_result<FnType, CArgs&..., TArgs...>::type;
 		using ArgsTupleT = std::tuple<TArgs...>;
 		using Indexes = std::index_sequence_for<TArgs...>;
 
@@ -392,7 +395,7 @@ namespace Lua
 		static int Function(lua_State* l)
 		{
 			using namespace std;
-			static_assert(std::is_invocable<decltype(fn), CArgs&..., TArgs...>::value, "Given function can't be called with such arguments!");
+			static_assert(std::is_invocable<FnType, CArgs&..., TArgs...>::value, "Given function can't be called with such arguments!");
 			using Upvalues = std::tuple<CArgs...>;
 
 			Upvalues upvalues;
