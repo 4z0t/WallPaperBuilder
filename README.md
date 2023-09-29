@@ -9,7 +9,7 @@ Install:
 * Lua
 * SDL
 * SDL_image
-
+* [LuaTemplateLibrary](https://github.com/4z0t/LuaTemplateLibrary)
 ###
 
 ## Lua scripting

@@ -9,11 +9,9 @@
 #include <SDL2/SDL_syswm.h>
 #include <SDL2/SDL_timer.h>
 #include "WallPaper.hpp"
-#include "LuaTemplates.hpp"
-#include "LuaState.hpp"
 #include "TrayIcon.h"
-#include "Tests.hpp"
-//#include "Utility.hpp"
+#include <LuaTemplateLibrary/LuaFunctions.hpp>
+#include <LuaTemplateLibrary/LuaAux.hpp>
 
 #undef main
 #define FPS 60
@@ -69,8 +67,6 @@ int main(int argc, char* argv[])
 	lua_State* L = luaL_newstate();
 	luaL_openlibs(L);
 
-	Test(L);
-
 	uint32_t startingTick = 0;
 
 	App::Window ui(
@@ -99,10 +95,10 @@ int main(int argc, char* argv[])
 	bool isRunning = true;
 
 
-	Lua::RegisterFunction(L, "SetColor", Lua::CFunctionWrapper<SetColor, Uint8, Uint8, Uint8, Uint8>::Function);
-	Lua::RegisterFunction(L, "DrawRect", Lua::CFunctionWrapper<DrawRect, float, float, float, float>::Function);
-	Lua::RegisterFunction(L, "DrawLine", Lua::CFunctionWrapper<DrawLine, float, float, float, float>::Function);
-	Lua::RegisterFunction(L, "GetWindowSize", Lua::CFunctionWrapper<GetWallpaperWindowSize>::Function);
+	Lua::RegisterFunction(L, "SetColor", Lua::CFunction<SetColor>::Function< Uint8, Uint8, Uint8, Uint8>);
+	Lua::RegisterFunction(L, "DrawRect", Lua::CFunction<DrawRect>::Function<float, float, float, float>);
+	Lua::RegisterFunction(L, "DrawLine", Lua::CFunction<DrawLine>::Function<float, float, float, float>);
+	Lua::RegisterFunction(L, "GetWindowSize", Lua::CFunction<GetWallpaperWindowSize>::Function);
 
 
 	if (luaL_dofile(L, "main.lua"))
