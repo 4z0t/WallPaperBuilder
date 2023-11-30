@@ -27,7 +27,8 @@ end
 
 
 function Main()
-    w, h = GetWindowSize()
+    w = GetWindowWidth()
+    h = GetWindowHeight()
     print(w, h)
     w, h = math.min(1920, w), math.min(1080, h)
     math.randomseed()
@@ -61,7 +62,7 @@ function OnUpdate(delta)
 end
 
 function OnFrame(delta)
-    SetColor(255, 255, 0, 255)
+    SetColor(255, 0, 0, 255)
     for i, star in ipairs(stars) do
         DrawStar(star)
     end
